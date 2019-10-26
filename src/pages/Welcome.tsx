@@ -1,6 +1,8 @@
 import React from 'react'
-import { Button, StyleSheet, StatusBar, SafeAreaView } from 'react-native'
+import { Button, StyleSheet, StatusBar, SafeAreaView, ImageBackground } from 'react-native'
 import { PageProps } from './interface'
+import { colors } from '~/style/cores';
+import { Buttonperson } from '~/components/Button';
 
 export function Welcome ({ navigation }: PageProps) {
   function navigate (route) {
@@ -9,9 +11,9 @@ export function Welcome ({ navigation }: PageProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="white" />
-      <Button title="Go to Login" onPress={navigate('Login')} />
-      <Button title="Go to Register" onPress={navigate('Register')} />
+      <StatusBar barStyle="light-content" translucent={false} backgroundColor={colors.escr} />
+      <Buttonperson onPress={navigate('Login')} styleButton={styles.botao}> Fazer Login </Buttonperson>
+      <Buttonperson onPress={navigate('Register')} styleButton={styles.botao}> Criar Usuário </Buttonperson>
     </SafeAreaView>
   )
 }
@@ -19,6 +21,10 @@ export function Welcome ({ navigation }: PageProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: colors.escr
+  },
+  botao:{
+    padding: 20
   }
 })

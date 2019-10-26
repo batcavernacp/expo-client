@@ -6,6 +6,7 @@ import { Register } from './pages/Register'
 import { SplashScreen } from './pages/SplashScreen'
 import { Welcome } from './pages/Welcome'
 import { Settings, navigationOptionsSettings } from './pages/Settings'
+import { colors } from './style/cores';
 
 const AuthStack = createStackNavigator(
   {
@@ -35,11 +36,12 @@ const AppStack = createStackNavigator(
     initialRouteName: 'Home',
     defaultNavigationOptions: {
       headerStyle: {
-        backgroundColor: '#6a51ae'
+        backgroundColor: colors.vrdesc
       },
-      headerTintColor: '#fff',
+      headerTintColor: colors.claro,
       headerTitleStyle: {
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontSize: 20
       }
     }
   }

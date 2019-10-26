@@ -1,19 +1,21 @@
 import React, { useState } from 'react'
-import { Button, Text, View, StyleSheet, TextInput } from 'react-native'
+import { Button, Text, View, StyleSheet, TextInput, KeyboardAvoidingView, StatusBar } from 'react-native'
 import { useAuthAction } from '../actions/useAuthAction'
 import { useBackButton } from '../device/useBackButton'
 import { object, string } from 'yup'
 import { FormikProps, Formik, FormikHelpers } from 'formik'
-import { SafeAreaView } from 'react-navigation'
+import { SafeAreaView, ScrollView } from 'react-navigation'
 import { PageProps } from './interface'
 import { TextInputFormik } from '~/components/form/Input'
 import { useFocus } from '~/useFocus'
+import { colors } from '~/style/cores';
+import { Buttonperson } from '~/components/Button';
 
 interface RegisterForm {
   email: string;
+  username: string;
   password: string;
   confirmPassword: string;
-  username: string;
 }
 
 const initialValues: RegisterForm = {
@@ -25,19 +27,19 @@ const initialValues: RegisterForm = {
 
 const validation = object().shape({
   email: string()
-    .email('Invalid Email')
-    .required('Invalid Email'),
+    .email('Email inválido')
+    .required('Email inválido'),
 
   username: string()
-    .required('username required'),
+    .required('Nome de usuário necessário'),
 
   password: string()
-    .min(6, 'minimum 6 length')
-    .required('minimum 6 length'),
+    .min(6, 'Senha deve conter no minimo 6 caracteres')
+    .required('Senha deve conter no minimo 6 caracteres'),
 
   confirmPassword: string()
-    .required('password dont match')
-    .test('compare', 'passwords dont match',
+    .required('senhas não conferem')
+    .test('compare', 'senhas não conferem',
       function (confirmPassword) {
         return confirmPassword === this.parent.password
       })
@@ -60,7 +62,8 @@ export function Register ({ navigation }: PageProps) {
 
     if (loading) return <Text>loading</Text>
 
-    return <>
+    return <ScrollView>
+      {/* <StatusBar barStyle="light-content" translucent={true} backgroundColor={colors.vrdesc} /> */}
       <TextInputFormik
         autoFocus={true}
         textContentType="emailAddress"
@@ -101,9 +104,11 @@ export function Register ({ navigation }: PageProps) {
         returnKeyType="done"
         blurOnSubmit={props.isValid}
       />
-      <Button title="Signup" onPress={handleSubmit} />
-      <Button title="Back" onPress={() => navigation.goBack(null)} />
-      <Text>{error}</Text></>
+      <Buttonperson onPress={handleSubmit} styleButton={styles.botao}> Cadastrar </Buttonperson>
+
+      <Buttonperson onPress={() => navigation.goBack(null)} styleButton={styles.botao}> Voltar </Buttonperson>
+
+      <Text>{error}</Text></ScrollView>
   }
 
   function submit (values: RegisterForm, props: FormikHelpers<RegisterForm>) {
@@ -126,6 +131,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: colors.escr
+  },
+  botao: {
+  flexShrink: 1
   }
 })

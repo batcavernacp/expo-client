@@ -1,13 +1,15 @@
 import React from 'react'
 import { Formik, FormikHelpers, FormikProps } from 'formik'
-import { Button, StyleSheet, Text, TextInput } from 'react-native'
+import { Button, StyleSheet, Text, TextInput, ActivityIndicator } from 'react-native'
 import { object, string } from 'yup'
 import { useFocus } from '~/useFocus'
 import { useAuthAction } from '../actions/useAuthAction'
 import { TextInputFormik } from '../components/form/Input'
 import { useBackButton } from '../device/useBackButton'
-import { SafeAreaView } from 'react-navigation'
+import { SafeAreaView, ScrollView } from 'react-navigation'
 import { PageProps } from './interface'
+import { colors } from '~/style/cores';
+import { Buttonperson } from '~/components/Button';
 
 interface Values {
   email: string;
@@ -21,11 +23,11 @@ const initialValues: Values = {
 
 const validation = object().shape({
   email: string()
-    .email('Invalid Email')
-    .required('Invalid Email'),
+    .email('Email inválido')
+    .required('Email inválido'),
   password: string()
-    .min(6, 'minimum 6 length')
-    .required('minimum 6 length')
+    .min(6, 'Senha deve conter no minimo 6 caracteres')
+    .required('Senha deve conter no minimo 6 caracteres')
 })
 
 export function Login ({ navigation }: PageProps) {
@@ -36,10 +38,10 @@ export function Login ({ navigation }: PageProps) {
   function LoginForm (props: FormikProps<Values>) {
     const handleSubmit = ev => props.handleSubmit(ev)
     if (loading) {
-      return <Text>Loading</Text>
+      return  <ActivityIndicator size="large" color={colors.fl} />
     }
     return (
-      <>
+      <ScrollView>
         <TextInputFormik
           autoFocus={true}
           textContentType="emailAddress"
@@ -59,10 +61,10 @@ export function Login ({ navigation }: PageProps) {
           returnKeyType="done"
           blurOnSubmit={props.isValid}
         />
-        <Button title="Login" onPress={handleSubmit} />
-        <Button title="Voltar" onPress={() => navigation.goBack(null)} />
+        <Buttonperson onPress={handleSubmit} styleButton={styles.botao}> Login </Buttonperson>
+        <Buttonperson onPress={() => navigation.goBack(null)} styleButton={styles.botao}> Voltar </Buttonperson>
         <Text>{error}</Text>
-      </>
+      </ScrollView>
     )
   }
 
@@ -88,6 +90,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: colors.escr
+  },
+  botao: {
+    padding: 12
   }
 })

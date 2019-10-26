@@ -1,0 +1,84 @@
+directive @owner on FIELD_DEFINITION
+directive @auth on FIELD_DEFINITION
+
+interface Node { 
+    id: ID!
+}
+type RegisterPayload { 
+    user: User!
+}
+type LoginPayload { 
+    user: User!
+}
+type CheckUsernamePayload { 
+    available: Boolean!
+}
+type SwitchedPayload { 
+    turned: SWITCH!
+    relay: Int!
+}
+type BaseNode { 
+    id: ID!
+    createdAt: String
+    updatedAt: String
+}
+type PageInfo { 
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+}
+type Payload { 
+    error: String
+}
+type User implements Node { 
+    username: String
+    email: String
+    id: ID!
+    createdAt: String
+    updatedAt: String
+}
+type MePayload { 
+    user: User!
+    test: User!
+}
+type SearchPayload { 
+    users: UserConnection
+}
+type Query { 
+    node(id: ID!): Node
+    users(username: String!, after: String, before: String, first: Int, last: Int): SearchPayload!
+    me: MePayload @auth
+}
+type Mutation { 
+    register(newUser: RegisterInput!): RegisterPayload!
+    login: LoginPayload! @auth
+    checkPreRegister(check: CheckPreRegister!): CheckUsernamePayload!
+    switch(input: SwitchInput!): Boolean
+}
+type Subscription { 
+    switched: SwitchedPayload!
+    test: User
+}
+input RegisterInput { 
+    username: String!
+}
+input CheckPreRegister { 
+    username: String!
+}
+input SwitchInput { 
+    turn: SWITCH!
+    relay: Int!
+}
+enum SWITCH { 
+    ON
+    OFF
+}
+type UserEdge { 
+    cursor: String
+    node: User
+}
+type UserConnection { 
+    edges: [UserEdge]!
+    pageInfo: PageInfo!
+}

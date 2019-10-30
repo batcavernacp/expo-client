@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Text, View, StyleSheet, TextInput, KeyboardAvoidingView, StatusBar } from 'react-native'
+import { Button, Text, View, StyleSheet, TextInput, KeyboardAvoidingView, StatusBar, Platform, TouchableWithoutFeedback, Keyboard, ActivityIndicator } from 'react-native'
 import { useAuthAction } from '../actions/useAuthAction'
 import { useBackButton } from '../device/useBackButton'
 import { object, string } from 'yup'
@@ -8,8 +8,8 @@ import { SafeAreaView, ScrollView } from 'react-navigation'
 import { PageProps } from './interface'
 import { TextInputFormik } from '~/components/form/Input'
 import { useFocus } from '~/useFocus'
-import { colors } from '~/style/cores';
-import { Buttonperson } from '~/components/Button';
+import { colors } from '~/style/cores'
+import { Buttonperson } from '~/components/Button'
 
 interface RegisterForm {
   email: string;
@@ -60,55 +60,60 @@ export function Register ({ navigation }: PageProps) {
     const checkUser = async () =>
       setUsernameAvailable(await checkUsername(props.values.username))
 
-    if (loading) return <Text>loading</Text>
+    if (loading) return <SafeAreaView style={styles.loading}><ActivityIndicator size="large" color={colors.fl} /></SafeAreaView>
 
-    return <ScrollView>
-      {/* <StatusBar barStyle="light-content" translucent={true} backgroundColor={colors.vrdesc} /> */}
-      <TextInputFormik
-        autoFocus={true}
-        textContentType="emailAddress"
-        placeholder="email"
-        name="email"
-        onSubmitEditing={setUsernameFocus}
-        blurOnSubmit={false}
-        returnKeyType="next"
-      />
-      <TextInputFormik
-        inputRef={usernameRef}
-        placeholder="username"
-        name="username"
-        onSubmitEditing={setPasswordFocus && checkUser}
-        blurOnSubmit={false}
-        returnKeyType="next"
-      />
-      {usernameAvailable !== null &&
+    return (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView style={styles.inner}>
+          <View style={{ flex: 1 }} />
+          {/* <StatusBar barStyle="light-content" translucent={true} backgroundColor={colors.vrdesc} /> */}
+          <TextInputFormik
+            autoFocus={false}
+            textContentType="emailAddress"
+            placeholder="email"
+            name="email"
+            onSubmitEditing={setUsernameFocus}
+            blurOnSubmit={false}
+            returnKeyType="next"
+          />
+          <TextInputFormik
+            inputRef={usernameRef}
+            placeholder="username"
+            name="username"
+            onSubmitEditing={setPasswordFocus}
+            blurOnSubmit={false}
+            returnKeyType="next"
+          />
+          {/* {usernameAvailable !== null &&
         <Text>{props.values.username && usernameAvailable ? 'available' : 'not available'}</Text>
-      }
-      <TextInputFormik
-        inputRef={passwordRef}
-        textContentType="password"
-        secureTextEntry={true}
-        placeholder="password"
-        name="password"
-        onSubmitEditing={setPassword2Focus}
-        blurOnSubmit={false}
-        returnKeyType="next"
-      />
-      <TextInputFormik
-        inputRef={password2Ref}
-        textContentType="password"
-        secureTextEntry={true}
-        placeholder="confirm password"
-        name="confirmPassword"
-        onSubmitEditing={handleSubmit}
-        returnKeyType="done"
-        blurOnSubmit={props.isValid}
-      />
-      <Buttonperson onPress={handleSubmit} styleButton={styles.botao}> Cadastrar </Buttonperson>
+          } */}
+          <TextInputFormik
+            inputRef={passwordRef}
+            textContentType="password"
+            secureTextEntry={true}
+            placeholder="password"
+            name="password"
+            onSubmitEditing={setPassword2Focus}
+            blurOnSubmit={false}
+            returnKeyType="next"
+          />
+          <TextInputFormik
+            inputRef={password2Ref}
+            textContentType="password"
+            secureTextEntry={true}
+            placeholder="confirm password"
+            name="confirmPassword"
+            onSubmitEditing={handleSubmit}
+            returnKeyType="done"
+            blurOnSubmit={props.isValid}
+          />
+          <Buttonperson onPress={handleSubmit} styleButton={styles.botao}> Cadastrar </Buttonperson>
 
-      <Buttonperson onPress={() => navigation.goBack(null)} styleButton={styles.botao}> Voltar </Buttonperson>
-
-      <Text>{error}</Text></ScrollView>
+          <Text>{error}</Text>
+          <View style={{ flex: 1 }} />
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    )
   }
 
   function submit (values: RegisterForm, props: FormikHelpers<RegisterForm>) {
@@ -116,14 +121,14 @@ export function Register ({ navigation }: PageProps) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={styles.container}>
       <Formik
         initialValues={initialValues}
         validationSchema={validation}
         onSubmit={submit}
         render={RegisterForm}
       />
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -135,6 +140,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.escr
   },
   botao: {
-  flexShrink: 1
+    flexShrink: 1
+  },
+  inner: {
+    flex: 1,
+    backgroundColor: colors.escr,
+    justifyContent: 'flex-end'
+  },
+  loading: {
+    flex: 1,
+    backgroundColor: colors.escr,
+    justifyContent: 'center'
   }
 })

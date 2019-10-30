@@ -5,14 +5,16 @@ import { Login } from './pages/Login'
 import { Register } from './pages/Register'
 import { SplashScreen } from './pages/SplashScreen'
 import { Welcome } from './pages/Welcome'
+import { ReadQRCode } from './pages/ReadQRCode'
 import { Settings, navigationOptionsSettings } from './pages/Settings'
-import { colors } from './style/cores';
+import { colors } from './style/cores'
 
 const AuthStack = createStackNavigator(
   {
     Login,
     Register,
-    Welcome
+    Welcome,
+    ReadQRCode
   },
   {
     headerMode: 'none',

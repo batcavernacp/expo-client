@@ -1,6 +1,6 @@
 import React from 'react'
 import { Formik, FormikHelpers, FormikProps } from 'formik'
-import { Button, StyleSheet, Text, TextInput, ActivityIndicator } from 'react-native'
+import { Button, StyleSheet, Text, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform, View, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import { object, string } from 'yup'
 import { useFocus } from '~/useFocus'
 import { useAuthAction } from '../actions/useAuthAction'
@@ -8,8 +8,8 @@ import { TextInputFormik } from '../components/form/Input'
 import { useBackButton } from '../device/useBackButton'
 import { SafeAreaView, ScrollView } from 'react-navigation'
 import { PageProps } from './interface'
-import { colors } from '~/style/cores';
-import { Buttonperson } from '~/components/Button';
+import { colors } from '~/style/cores'
+import { Buttonperson } from '~/components/Button'
 
 interface Values {
   email: string;
@@ -38,33 +38,37 @@ export function Login ({ navigation }: PageProps) {
   function LoginForm (props: FormikProps<Values>) {
     const handleSubmit = ev => props.handleSubmit(ev)
     if (loading) {
-      return  <ActivityIndicator size="large" color={colors.fl} />
+      return <SafeAreaView style={styles.loading}><ActivityIndicator size="large" color={colors.fl} /></SafeAreaView>
     }
     return (
-      <ScrollView>
-        <TextInputFormik
-          autoFocus={true}
-          textContentType="emailAddress"
-          placeholder="email"
-          name="email"
-          onSubmitEditing={setPasswordFocus}
-          blurOnSubmit={false}
-          returnKeyType="next"
-        />
-        <TextInputFormik
-          inputRef={passwordRef}
-          textContentType="password"
-          secureTextEntry={true}
-          placeholder="password"
-          name="password"
-          onSubmitEditing={handleSubmit}
-          returnKeyType="done"
-          blurOnSubmit={props.isValid}
-        />
-        <Buttonperson onPress={handleSubmit} styleButton={styles.botao}> Login </Buttonperson>
-        <Buttonperson onPress={() => navigation.goBack(null)} styleButton={styles.botao}> Voltar </Buttonperson>
-        <Text>{error}</Text>
-      </ScrollView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView style={styles.view}>
+          <View style={{ flex: 1 }} />
+          <TextInputFormik
+            autoFocus={false}
+            textContentType="emailAddress"
+            placeholder="email"
+            name="email"
+            onSubmitEditing={setPasswordFocus}
+            blurOnSubmit={false}
+            returnKeyType="next"
+          />
+          <TextInputFormik
+            inputRef={passwordRef}
+            textContentType="password"
+            secureTextEntry={true}
+            placeholder="password"
+            name="password"
+            onSubmitEditing={handleSubmit}
+            returnKeyType="done"
+            blurOnSubmit={props.isValid}
+          />
+          <Buttonperson onPress={handleSubmit} styleButton={styles.botao}> Login </Buttonperson>
+          <Buttonperson onPress={() => navigation.goBack(null)} styleButton={styles.botao}> Voltar </Buttonperson>
+          <Text>{error}</Text>
+          <View style={{ flex: 1 }} />
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
     )
   }
 
@@ -75,25 +79,32 @@ export function Login ({ navigation }: PageProps) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={styles.container}>
       <Formik
         initialValues={initialValues}
         validationSchema={validation}
         onSubmit={submit}
         render={LoginForm}
       />
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    backgroundColor: colors.escr
+    flex: 1
   },
   botao: {
     padding: 12
+  },
+  view: {
+    flex: 1,
+    backgroundColor: colors.escr,
+    justifyContent: 'flex-end'
+  },
+  loading: {
+    flex: 1,
+    backgroundColor: colors.escr,
+    justifyContent: 'center'
   }
 })

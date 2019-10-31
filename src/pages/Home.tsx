@@ -10,7 +10,6 @@ import { useAuthAction } from '~/actions/useAuthAction'
 
 export function Home ({ navigation }: PageProps) {
   const { switchRelay, state, error } = useAutomationAction()
-  const { logout } = useAuthAction()
 
   function navigate (route) {
     return () => navigation.navigate(route)
@@ -22,21 +21,18 @@ export function Home ({ navigation }: PageProps) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={{ flex: 1 }}/>
       <StatusBar barStyle="light-content" translucent={true} backgroundColor={colors.vrdesc} />
       <Text style={styles.error}>{error}</Text>
-      <Me />
-
       <Buttonperson onPress={switchOn(1)} styleButton={styles.botao}>Portão</Buttonperson>
-
-      <Buttonperson onPress={logout} styleButton={styles.botao}> Sair </Buttonperson>
-
+      <View style={{ flex: 1 }}/>
     </SafeAreaView>
   )
 }
 
 export function navigationOptionsHome ({ navigation }) {
   return {
-    title: 'BATCAVERNA'
+    header: null
   }
 }
 

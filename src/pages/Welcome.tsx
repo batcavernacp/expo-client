@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, StyleSheet, StatusBar, SafeAreaView, ImageBackground } from 'react-native'
+import { StyleSheet, StatusBar, SafeAreaView } from 'react-native'
 import { PageProps } from './interface'
 import { colors } from '~/style/cores'
 import { Buttonperson } from '~/components/Button'
@@ -11,7 +11,7 @@ export function Welcome ({ navigation }: PageProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" translucent={false} backgroundColor={colors.escr} />
+      <StatusBar barStyle="light-content" translucent={true} backgroundColor={colors.escr} />
       <Buttonperson onPress={navigate('Login')} styleButton={styles.botao}> Fazer Login </Buttonperson>
       <Buttonperson onPress={navigate('ReadQRCode')} styleButton={styles.botao}> Criar Usuário </Buttonperson>
     </SafeAreaView>

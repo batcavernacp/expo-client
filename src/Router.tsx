@@ -86,7 +86,9 @@ const AppTabs = createMaterialTopTabNavigator({
   tabBarOptions: {
     tabStyle: {
       backgroundColor: colors.vrdmed
-    }
+    },
+    inactiveTintColor: colors.escr,
+    activeTintColor: colors.fl
   }
 })
 

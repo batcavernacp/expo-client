@@ -65,7 +65,7 @@ export function Login ({ navigation }: PageProps) {
           />
           <Buttonperson onPress={handleSubmit} styleButton={styles.botao}> Login </Buttonperson>
           <Buttonperson onPress={() => navigation.goBack(null)} styleButton={styles.botao}> Voltar </Buttonperson>
-          <Text>{error}</Text>
+          <Text style={styles.error}>{error}</Text>
           <View style={{ flex: 1 }} />
         </SafeAreaView>
       </TouchableWithoutFeedback>
@@ -96,6 +96,11 @@ const styles = StyleSheet.create({
   },
   botao: {
     padding: 12
+  },
+  error: {
+    color: colors.claro,
+    alignSelf: 'center',
+    paddingHorizontal: 30
   },
   view: {
     flex: 1,

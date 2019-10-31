@@ -4,15 +4,11 @@ import { useMutation } from 'relay-hooks'
 import { useDispatch } from '../reducer'
 import firebase from '../services/firebase'
 import useNavigation from '~/useNavigation'
-import * as SecureStore from 'expo-secure-store'
 
 const MUTATION_REGISTER = graphql`
-  mutation useAuthActionRegisterMutation($newUser: RegisterInput!) {
-    register(newUser: $newUser) {
-      user {
-        id
-        username
-      }
+  mutation useAuthActionRegisterWithDeviceMutation($input: RegisterWithDeviceInput!) {
+    registerWithDevice(input: $input) {
+      success
     }
   }
 `
@@ -22,16 +18,16 @@ const MUTATION_LOGIN = graphql`
     login {
       user {
         id
-        username
+        email
       }
     }
   }
 `
 
 const MUTATION_CHECK = graphql`
-  mutation useAuthActionCheckMutation($check: CheckPreRegister!) {
-    checkPreRegister(check: $check) {
-      available
+  mutation useAuthActionCheckQRCodeMutation($input: RegisterWithDeviceInput!) {
+    checkQRCode(input: $input) {
+      success
     }
   }
 `
@@ -51,14 +47,14 @@ export function useAuthAction () {
     navigation.navigate('Auth')
   }
 
-  async function checkUsername (username) {
+  async function checkQRCode (qrcode: string) {
     try {
       setLoading(true)
-      const { checkPreRegister } = await mutateCheck({
-        variables: { check: { username } }
+      const { checkQRCode } = await mutateCheck({
+        variables: { input: { qrcode } }
       })
       setLoading(false)
-      return checkPreRegister.available
+      return checkQRCode.success
     } catch (err) {
       setLoading(false)
       setError(err.message)
@@ -72,7 +68,6 @@ export function useAuthAction () {
       const { emailVerified, email } = firebase.auth().currentUser
       const data = await mutateLogin({ variables: {} })
       setLoading(false)
-      console.log({ data })
       if (!data.login.user) {
         await logout()
         return false
@@ -80,7 +75,6 @@ export function useAuthAction () {
       authDispatch.login({ email, emailVerified, ...data.login.user })
       return true
     } catch (err) {
-      console.log(err)
       setLoading(false)
       setError(err.message)
       return false
@@ -110,31 +104,25 @@ export function useAuthAction () {
     }
   }
 
-  async function register (email: string, password: string, username: string) {
+  async function registerWithDevice (email: string, password: string, qrcode: string) {
     try {
       setLoading(true)
       setError('')
-      const { checkPreRegister } = await mutateCheck({
-        variables: { check: { username } }
-      })
-
-      if (!checkPreRegister.available) {
-        throw new Error('Username already exists')
-      }
+      if (!await checkQRCode(qrcode)) throw new Error('')
 
       const { user } = await firebase
         .auth()
         .createUserWithEmailAndPassword(email, password)
-      const data = await mutateRegister({
-        variables: { newUser: { username } }
+
+      const { registerWithDevice } = await mutateRegister({
+        variables: { input: { qrcode } }
       })
       authDispatch.login({
         email,
-        emailVerified: user.emailVerified,
-        ...data.register.user
+        emailVerified: user.emailVerified
       })
       setLoading(false)
-      navigation.navigate('App')
+      if (registerWithDevice.success) navigation.navigate('App')
       return true
     } catch (err) {
       setLoading(false)
@@ -149,7 +137,7 @@ export function useAuthAction () {
     login,
     loginEmailPassword,
     logout,
-    register,
-    checkUsername
+    registerWithDevice,
+    checkQRCode
   }
 }

@@ -17,6 +17,12 @@ type SwitchedPayload {
     turned: SWITCH!
     relay: Int!
 }
+type RegisterWithDevicePayload { 
+    success: Boolean
+}
+type CreateDevicePayload { 
+    token: String!
+}
 type BaseNode { 
     id: ID!
     createdAt: String
@@ -54,7 +60,10 @@ type Mutation {
     register(newUser: RegisterInput!): RegisterPayload!
     login: LoginPayload! @auth
     checkPreRegister(check: CheckPreRegister!): CheckUsernamePayload!
-    switch(input: SwitchInput!): Boolean
+    switch(input: SwitchInput!): Boolean @auth
+    registerWithDevice(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
+    checkQRCode(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
+    createDevice(device: CreateDeviceInput!): CreateDevicePayload!
 }
 type Subscription { 
     switched: SwitchedPayload!
@@ -69,6 +78,13 @@ input CheckPreRegister {
 input SwitchInput { 
     turn: SWITCH!
     relay: Int!
+}
+input RegisterWithDeviceInput { 
+    qrcode: String!
+    name: String
+}
+input CreateDeviceInput { 
+    id: String
 }
 enum SWITCH { 
     ON

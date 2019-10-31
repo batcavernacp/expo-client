@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, StyleSheet, StatusBar, Switch, Text, View, Dimensions } from 'react-native'
 import { Me } from '../components/me'
 import { SafeAreaView } from 'react-navigation'
@@ -13,20 +13,37 @@ const screenWidth = Dimensions.get('window').width
 
 export function ReadQRCode ({ navigation }: PageProps) {
   const [Qrcode, codigo] = useQrcodeScanner()
+  const { checkQRCode } = useAuthAction()
+  const [message, setMessage] = useState('Leia o QR Code')
 
   function navigate (route) {
     return () => navigation.navigate(route)
   }
 
   useEffect(() => {
+    if (!codigo) return
+    setMessage('Checando codigo')
+    checkQRCode(codigo).then(success => {
+      if (!success) {
+        setMessage('Codigo inválido, leia outro codigo')
+        return
+      }
+
+      navigation.navigate('Register', { codigo })
+      return true
+    }).catch(err => {
+      console.log(err)
+      setMessage('Codigo inválido, leia outro codigo')
+      return false
+    })
+
     // checar codigo no backend
-    if (codigo) navigation.navigate('Register')
   }, [codigo])
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.code}>{codigo}</Text>
       <View style={{ flex: 1 }}/>
+      <Text style={styles.text}>{message}</Text>
       <View style={styles.qrcodescanner}>
         <Qrcode/>
       </View>
@@ -48,7 +65,7 @@ const styles = StyleSheet.create({
     height: screenWidth,
     width: screenWidth
   },
-  code: {
+  text: {
     color: colors.claro
   }
 })

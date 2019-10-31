@@ -5,8 +5,7 @@ export interface Auth extends LoginPayload {
 export const initialState: Auth = {
   email: null,
   emailVerified: null,
-  logged: false,
-  username: null
+  logged: false
 }
 
 const types = {
@@ -32,7 +31,6 @@ export function authReducer (state: Auth, action) {
 
 interface LoginPayload {
   emailVerified: boolean;
-  username: string;
   email: string;
 }
 

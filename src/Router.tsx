@@ -8,6 +8,7 @@ import { Welcome } from './pages/Welcome'
 import { ReadQRCode } from './pages/ReadQRCode'
 import { Settings, navigationOptionsSettings } from './pages/Settings'
 import { colors } from './style/cores'
+import { createMaterialTopTabNavigator } from 'react-navigation-tabs'
 
 const AuthStack = createStackNavigator(
   {
@@ -23,15 +24,11 @@ const AuthStack = createStackNavigator(
   }
 )
 
-const AppStack = createStackNavigator(
+const HomeStack = createStackNavigator(
   {
     Home: {
       navigationOptions: navigationOptionsHome,
       screen: Home
-    },
-    Settings: {
-      navigationOptions: navigationOptionsSettings,
-      screen: Settings
     }
   },
   {
@@ -49,9 +46,53 @@ const AppStack = createStackNavigator(
   }
 )
 
+const SettingsStack = createStackNavigator(
+  {
+    Settings: {
+      navigationOptions: navigationOptionsSettings,
+      screen: Settings
+    }
+  },
+  {
+    initialRouteName: 'Settings',
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: colors.vrdesc
+      },
+      headerTintColor: colors.claro,
+      headerTitleStyle: {
+        fontWeight: 'bold',
+        fontSize: 20
+      }
+    }
+  }
+)
+
+const AppTabs = createMaterialTopTabNavigator({
+  HomeTab: {
+    screen: HomeStack,
+    navigationOptions: {
+      tabBarLabel: 'Home'
+    }
+  },
+  SettingTab: {
+    screen: SettingsStack,
+    navigationOptions: {
+      tabBarLabel: 'Settings'
+    }
+  }
+}, {
+  tabBarPosition: 'bottom',
+  tabBarOptions: {
+    tabStyle: {
+      backgroundColor: colors.vrdmed
+    }
+  }
+})
+
 const AppNavigator = createSwitchNavigator(
   {
-    App: AppStack,
+    App: AppTabs,
     Auth: AuthStack,
     SplashScreen
   },

@@ -44,11 +44,6 @@ export function useAutomationAction () {
           }
         }
       })
-      if (action == 'ON') {
-        setTimeout(() => {
-          switchRelay('OFF', relay)
-        }, 25)
-      }
       setLoading(false)
     } catch (err) {
       console.log(err)

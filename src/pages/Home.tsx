@@ -17,12 +17,22 @@ export function Home ({ navigation }: PageProps) {
     return () => switchRelay('ON', relay)
   }
 
+  function switchOff (relay) {
+    return () => switchRelay('OFF', relay)
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar translucent={true} backgroundColor="transparent"/>
       <View style={{ flex: 1 }} />
       <Text style={styles.error}>{error}</Text>
-      <Buttonperson onPress={switchOn(1)} styleButton={styles.botao}>Portão</Buttonperson>
+      <Buttonperson
+        onPressOut={switchOff(1)}
+        onPressIn={switchOn(1)}
+        styleButton={styles.botao}
+      >
+        Portão
+      </Buttonperson>
       <View style={{ flex: 1 }} />
     </SafeAreaView>
   )

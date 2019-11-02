@@ -4,25 +4,6 @@ directive @auth on FIELD_DEFINITION
 interface Node { 
     id: ID!
 }
-type RegisterPayload { 
-    user: User!
-}
-type LoginPayload { 
-    user: User!
-}
-type CheckUsernamePayload { 
-    available: Boolean!
-}
-type SwitchedPayload { 
-    turned: SWITCH!
-    relay: Int!
-}
-type MyDevicesPayolad { 
-    devices: [Device]
-}
-type RegisterWithDevicePayload { 
-    success: Boolean
-}
 type Device implements Node { 
     owner: User
     name: String
@@ -31,8 +12,11 @@ type Device implements Node {
     createdAt: String
     updatedAt: String
 }
-type CreateDevicePayload { 
-    token: String!
+type User implements Node { 
+    email: String
+    id: ID!
+    createdAt: String
+    updatedAt: String
 }
 type BaseNode { 
     id: ID!
@@ -48,44 +32,47 @@ type PageInfo {
 type Payload { 
     error: String
 }
-type User implements Node { 
-    email: String
-    id: ID!
-    createdAt: String
-    updatedAt: String
+type LoginPayload { 
+    user: User!
+}
+type MyDevicesPayload { 
+    owned: [Device]
+    guest: [Device]
+}
+type CreateDevicePayload { 
+    token: String!
+}
+type RegisterWithDevicePayload { 
+    success: Boolean
+}
+type SwitchedPayload { 
+    turned: SWITCH!
+    relay: Int!
 }
 type Query { 
-    myDevices: MyDevicesPayolad! @auth
     node(id: ID!): Node
+    myDevices: MyDevicesPayload! @auth
 }
 type Mutation { 
-    register(newUser: RegisterInput!): RegisterPayload!
     login: LoginPayload! @auth
-    checkPreRegister(check: CheckPreRegister!): CheckUsernamePayload!
-    switch(input: SwitchInput!): Boolean @auth
+    createDevice(device: CreateDeviceInput!): CreateDevicePayload!
     registerWithDevice(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
     checkQRCode(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
-    createDevice(device: CreateDeviceInput!): CreateDevicePayload!
+    switch(input: SwitchInput!): Boolean @auth
 }
 type Subscription { 
     switched: SwitchedPayload!
 }
-input RegisterInput { 
-    username: String!
-}
-input CheckPreRegister { 
-    username: String!
-}
-input SwitchInput { 
-    turn: SWITCH!
-    relay: Int!
+input CreateDeviceInput { 
+    id: String
 }
 input RegisterWithDeviceInput { 
     qrcode: String!
     name: String
 }
-input CreateDeviceInput { 
-    id: String
+input SwitchInput { 
+    turn: SWITCH!
+    device: ID!
 }
 enum SWITCH { 
     ON

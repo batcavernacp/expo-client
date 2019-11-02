@@ -28,8 +28,9 @@ const authLink = setContext(async (_, { headers }) =>
 )
 
 const httpLink = new HttpLink({
-  uri: __DEV__ ? 'http://192.168.100.13:3000/graphql' : 'https://automation-batcaverna.herokuapp.com/graphql'
-  // uri: 'http://192.168.100.13:3000/graphql'
+  uri: __DEV__
+    ? 'http://192.168.100.13:3000/graphql'
+    : 'https://automation-batcaverna.herokuapp.com/graphql'
 })
 
 const subscriptionLink = () => new WebSocketLink({
@@ -37,8 +38,9 @@ const subscriptionLink = () => new WebSocketLink({
     connectionParams: async () => (token ? { token: await token } : {}),
     reconnect: true
   },
-  uri: __DEV__ ? 'ws://192.168.100.13:3000/graphql' : 'wss://automation-batcaverna.herokuapp.com/graphql'
-  // uri: 'ws://192.168.100.13:3000/graphql'
+  uri: __DEV__
+    ? 'ws://192.168.100.13:3000/graphql'
+    : 'wss://automation-batcaverna.herokuapp.com/graphql'
 })
 
 function fetchFunction (operation, variables, cacheConfig, uploadables): any {

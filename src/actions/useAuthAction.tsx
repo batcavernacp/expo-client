@@ -18,7 +18,6 @@ const MUTATION_LOGIN = graphql`
     login {
       user {
         id
-        email
       }
     }
   }

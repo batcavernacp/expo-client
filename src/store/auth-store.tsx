@@ -5,7 +5,8 @@ export interface Auth extends LoginPayload {
 export const initialState: Auth = {
   email: null,
   emailVerified: null,
-  logged: false
+  logged: false,
+  id: null
 }
 
 const types = {
@@ -32,6 +33,7 @@ export function authReducer (state: Auth, action) {
 interface LoginPayload {
   emailVerified: boolean;
   email: string;
+  id: string;
 }
 
 export function useAuthDispatch (dispatch) {

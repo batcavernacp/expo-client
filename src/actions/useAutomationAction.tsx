@@ -22,7 +22,7 @@ export function useAutomationAction () {
   const [mutateSwitch] = useMutation(MUTATION_SWITCH)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [state, setState] = useState({ turned: 'OFF' })
+  const [state, setState] = useState({ turned: 'OFF', relay: 1 })
 
   useSubscription(SUBSCRIPTION_SWITCHED, {
     onNext: ({ switched }) => {
@@ -31,23 +31,23 @@ export function useAutomationAction () {
     }
   })
 
-  async function switchRelay (action, relay) {
+  async function switchRelay (action, device) {
     try {
       setLoading(true)
       setError('')
-      setState({ turned: action })
+      // setState({ turned: action, relay })
       await mutateSwitch({
         variables: {
           input: {
             turn: action,
-            relay
+            device
           }
         }
       })
       setLoading(false)
     } catch (err) {
       console.log(err)
-      setState({ turned: action === 'ON' ? 'OFF' : 'ON' })
+      // setState({ turned: action === 'ON' ? 'OFF' : 'ON', relay })
       setError(err[0] ? err[0].message : err.message)
     }
   }

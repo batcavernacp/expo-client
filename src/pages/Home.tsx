@@ -1,24 +1,44 @@
 import React from 'react'
 import { StyleSheet, StatusBar, Text, View } from 'react-native'
-import { SafeAreaView } from 'react-navigation'
+import { SafeAreaView, FlatList } from 'react-navigation'
 import { PageProps } from './interface'
 import { useAutomationAction } from '~/actions/useAutomationAction'
 import { colors } from '~/style/cores'
 import { Buttonperson } from '~/components/Button'
+import { MyDevices } from '~/components/myDevices/my-devices-component'
+import { useStore } from '~/reducer'
 
 export function Home ({ navigation }: PageProps) {
   const { switchRelay, state, error } = useAutomationAction()
-
+  const { myDevices } = useStore()
+  MyDevices()
   function navigate (route) {
     return () => navigation.navigate(route)
   }
 
-  function switchOn (relay) {
-    return () => switchRelay('ON', relay)
+  function switchOn (device) {
+    return () => switchRelay('ON', device)
   }
 
-  function switchOff (relay) {
-    return () => switchRelay('OFF', relay)
+  function switchOff (device) {
+    return () => switchRelay('OFF', device)
+  }
+
+  function renderDevice ({ item }) {
+    if (!item.id) return <></>
+    return (
+      <>
+        {/* <View style={[styles.led, state.turned === 'ON' && styles.active]} /> */}
+        <Buttonperson
+          onPressOut={switchOff(item.id)}
+          onPressIn={switchOn(item.id)}
+          styleButton={styles.botao}
+        >
+          {item.name}
+        </Buttonperson>
+
+      </>
+    )
   }
 
   return (
@@ -26,13 +46,10 @@ export function Home ({ navigation }: PageProps) {
       <StatusBar translucent={true} backgroundColor="transparent"/>
       <View style={{ flex: 1 }} />
       <Text style={styles.error}>{error}</Text>
-      <Buttonperson
-        onPressOut={switchOff(1)}
-        onPressIn={switchOn(1)}
-        styleButton={styles.botao}
-      >
-        Portão
-      </Buttonperson>
+      <FlatList
+        data={myDevices.guest}
+        renderItem={renderDevice}
+        keyExtractor={item => item.id} />
       <View style={{ flex: 1 }} />
     </SafeAreaView>
   )
@@ -55,5 +72,13 @@ const styles = StyleSheet.create({
   },
   error: {
     color: colors.fl
+  },
+  active: {
+    backgroundColor: colors.fl
+  },
+  led: {
+    height: 10,
+    width: 10,
+    borderRadius: 100
   }
 })

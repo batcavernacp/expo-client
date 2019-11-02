@@ -3,8 +3,8 @@ import { StyleSheet, View, StatusBar } from 'react-native'
 import { useAuthAction } from '../actions/useAuthAction'
 import { SafeAreaView } from 'react-navigation'
 import { Buttonperson } from '~/components/Button'
-import { Me } from '~/components/me'
 import { colors } from '~/style/cores'
+import { MyDevices } from '~/components/myDevices/my-devices-component'
 
 export function Settings () {
   const { logout } = useAuthAction()
@@ -12,8 +12,8 @@ export function Settings () {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}/>
-      <Me />
-      <Buttonperson onPress={logout} styleButton={styles.botao}> Sair </Buttonperson>
+      {/* <Buttonperson onPress={logout} styleButton={styles.botao}> Sair </Buttonperson> */}
+      <MyDevices />
       <View style={{ flex: 1 }}/>
     </SafeAreaView>
   )

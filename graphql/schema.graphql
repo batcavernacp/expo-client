@@ -17,8 +17,19 @@ type SwitchedPayload {
     turned: SWITCH!
     relay: Int!
 }
+type MyDevicesPayolad { 
+    devices: [Device]
+}
 type RegisterWithDevicePayload { 
     success: Boolean
+}
+type Device implements Node { 
+    owner: User
+    name: String
+    users: [User]
+    id: ID!
+    createdAt: String
+    updatedAt: String
 }
 type CreateDevicePayload { 
     token: String!
@@ -38,23 +49,14 @@ type Payload {
     error: String
 }
 type User implements Node { 
-    username: String
     email: String
     id: ID!
     createdAt: String
     updatedAt: String
 }
-type MePayload { 
-    user: User!
-    test: User!
-}
-type SearchPayload { 
-    users: UserConnection
-}
 type Query { 
+    myDevices: MyDevicesPayolad! @auth
     node(id: ID!): Node
-    users(username: String!, after: String, before: String, first: Int, last: Int): SearchPayload!
-    me: MePayload @auth
 }
 type Mutation { 
     register(newUser: RegisterInput!): RegisterPayload!
@@ -67,7 +69,6 @@ type Mutation {
 }
 type Subscription { 
     switched: SwitchedPayload!
-    test: User
 }
 input RegisterInput { 
     username: String!
@@ -89,12 +90,4 @@ input CreateDeviceInput {
 enum SWITCH { 
     ON
     OFF
-}
-type UserEdge { 
-    cursor: String
-    node: User
-}
-type UserConnection { 
-    edges: [UserEdge]!
-    pageInfo: PageInfo!
 }

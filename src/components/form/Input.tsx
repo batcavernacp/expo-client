@@ -1,7 +1,8 @@
 import { useField } from 'formik'
 import React, { MutableRefObject } from 'react'
-import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native'
+import { StyleSheet, TextInput, TextInputProps, View, Animated } from 'react-native'
 import { colors } from '~/style/cores'
+import { useAnimation } from 'react-native-animation-hooks'
 
 interface InputProps extends TextInputProps {
   name: string;
@@ -11,16 +12,25 @@ interface InputProps extends TextInputProps {
 export function TextInputFormik (props: InputProps) {
   const [field, meta] = useField(props.name)
 
+  const animatedOpacity = bool => useAnimation({
+    type: 'timing',
+    useNativeDriver: true,
+    toValue: bool ? 1 : 0,
+    initialValue: 0,
+    duration: bool ? 75 : 0
+  })
+
   function _onBlur (e) {
     if (props.onBlur) props.onBlur(e)
     field.onBlur(props.name)(e)
   }
 
   const error = () => meta.touched && meta.error
+
   const { inputRef } = props
   return (
     <View style={styles.container}>
-      {!!field.value && <Text style={styles.placeholder}>{props.placeholder || field.name}</Text>}
+      <Animated.Text style={[styles.placeholder, { opacity: animatedOpacity(!!field.value) }]}>{props.placeholder || field.name}</Animated.Text>
       <TextInput
         placeholderTextColor= {colors.vrdclr}
         ref={inputRef}
@@ -31,7 +41,7 @@ export function TextInputFormik (props: InputProps) {
         style={[styles.input, error() && styles.inputError, meta.touched && !meta.error && styles.inputSuccess]}
         // placeholder=""
       />
-      {error() && <Text style={styles.error}>{error()}</Text>}
+      <Animated.Text style={[styles.error, { opacity: animatedOpacity(error()) }]}>{error()}</Animated.Text>
     </View>
   )
 }
@@ -44,7 +54,7 @@ const styles = StyleSheet.create({
     color: '#f00'
   },
   input: {
-    borderBottomColor: '#aaa',
+    borderBottomColor: colors.claro,
     borderBottomWidth: 1,
     borderRadius: 2,
     fontSize: 15,
@@ -55,9 +65,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f00'
   },
   inputSuccess: {
-    borderBottomColor: '#0f0'
+    borderBottomColor: colors.fl
   },
   placeholder: {
-    color: '#aaa'
+    color: colors.vrdclr
   }
 })

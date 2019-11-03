@@ -7,7 +7,7 @@ interface Node {
 type Device implements Node { 
     owner: User
     name: String
-    users: [User]
+    usersInvited: [User]
     pendingInvites: [String]
     id: ID!
     createdAt: String

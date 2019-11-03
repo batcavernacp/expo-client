@@ -9,7 +9,7 @@ const QUERY_MY_DEVICES = graphql`
       owned {
         id
         name
-        users {
+        users: usersInvited {
           id
           email
         }

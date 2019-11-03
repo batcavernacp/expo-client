@@ -53,7 +53,7 @@ export function Register ({ navigation }: PageProps) {
   function RegisterForm (props: FormikProps<RegisterForm>) {
     const handleSubmit = ev => props.handleSubmit(ev)
 
-    if (loading) return <SafeAreaView style={styles.loading}><ActivityIndicator size="large" color={colors.fl} /></SafeAreaView>
+    if (props.isSubmitting) return <SafeAreaView style={styles.loading}><ActivityIndicator size="large" color={colors.fl} /></SafeAreaView>
 
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -100,10 +100,19 @@ export function Register ({ navigation }: PageProps) {
     )
   }
 
-  function submit (values: RegisterForm, props: FormikHelpers<RegisterForm>) {
-    return token
-      ? registerWithDevice(values.email, values.password, token)
-      : registerWithInvite(values.email, values.password)
+  async function submit (values: RegisterForm, props: FormikHelpers<RegisterForm>) {
+    try {
+      const res = token
+        ? await registerWithDevice(values.email, values.password, token)
+        : await registerWithInvite(values.email, values.password)
+      if (res) {
+        navigation.navigate('App')
+      } else {
+        props.setSubmitting(false)
+      }
+    } catch (err) {
+      props.setSubmitting(false)
+    }
   }
 
   return (

@@ -167,7 +167,6 @@ export function useAuthAction () {
         ...data.login.user
       })
       setLoading(false)
-      if (registerWithDevice.success) navigation.navigate('App')
       return true
     } catch (err) {
       setLoading(false)
@@ -199,7 +198,6 @@ export function useAuthAction () {
       })
 
       setLoading(false)
-      if (registerWithInvite.success) navigation.navigate('App')
       return true
     } catch (err) {
       setLoading(false)

@@ -8,8 +8,9 @@ import firebase from './services/firebase'
 
 let token: Promise<string>
 
-firebase.auth().onAuthStateChanged(user => {
+firebase.auth().onAuthStateChanged(async user => {
   token = user ? user.getIdToken(true) : null
+  console.log(await token)
 })
 
 const authLink = setContext(async (_, { headers }) =>

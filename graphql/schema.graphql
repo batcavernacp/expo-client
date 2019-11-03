@@ -8,6 +8,7 @@ type Device implements Node {
     owner: User
     name: String
     users: [User]
+    pendingInvites: [String]
     id: ID!
     createdAt: String
     updatedAt: String
@@ -32,6 +33,10 @@ type PageInfo {
 type Payload { 
     error: String
 }
+type ResponsePayload { 
+    success: Boolean!
+    error: String
+}
 type LoginPayload { 
     user: User!
 }
@@ -39,15 +44,23 @@ type MyDevicesPayload {
     owned: [Device]
     guest: [Device]
 }
+type RegisterInvitePayload { 
+    user: User
+    success: Boolean!
+    error: String
+}
 type CreateDevicePayload { 
     token: String!
 }
 type RegisterWithDevicePayload { 
     success: Boolean
 }
+type SendInvitePayload { 
+    success: Boolean
+}
 type SwitchedPayload { 
-    turned: SWITCH!
-    relay: Int!
+    turned: SWITCH
+    device: Device
 }
 type Query { 
     node(id: ID!): Node
@@ -55,13 +68,19 @@ type Query {
 }
 type Mutation { 
     login: LoginPayload! @auth
+    checkEmail(input: CheckEmailInput!): ResponsePayload!
+    registerWithInvite: RegisterInvitePayload!
     createDevice(device: CreateDeviceInput!): CreateDevicePayload!
     registerWithDevice(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
     checkQRCode(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
+    sendInvite(input: SendInviteInput!): SendInvitePayload! @auth
     switch(input: SwitchInput!): Boolean @auth
 }
 type Subscription { 
-    switched: SwitchedPayload!
+    switched: SwitchedPayload
+}
+input CheckEmailInput { 
+    email: String!
 }
 input CreateDeviceInput { 
     id: String
@@ -69,6 +88,10 @@ input CreateDeviceInput {
 input RegisterWithDeviceInput { 
     qrcode: String!
     name: String
+}
+input SendInviteInput { 
+    device: ID!
+    email: String!
 }
 input SwitchInput { 
     turn: SWITCH!

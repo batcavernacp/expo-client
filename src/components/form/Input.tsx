@@ -1,7 +1,7 @@
 import { useField } from 'formik'
 import React, { MutableRefObject } from 'react'
 import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native'
-import { colors } from '~/style/cores';
+import { colors } from '~/style/cores'
 
 interface InputProps extends TextInputProps {
   name: string;
@@ -22,7 +22,7 @@ export function TextInputFormik (props: InputProps) {
     <View style={styles.container}>
       {!!field.value && <Text style={styles.placeholder}>{props.placeholder || field.name}</Text>}
       <TextInput
-      placeholderTextColor= {colors.vrdclr}
+        placeholderTextColor= {colors.vrdclr}
         ref={inputRef}
         value={field.value}
         onChangeText={field.onChange(props.name)}

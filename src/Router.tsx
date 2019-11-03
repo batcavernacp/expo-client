@@ -9,13 +9,15 @@ import { ReadQRCode } from './pages/ReadQRCode'
 import { Settings, navigationOptionsSettings } from './pages/Settings'
 import { colors } from './style/cores'
 import { createMaterialTopTabNavigator } from 'react-navigation-tabs'
+import { CheckInviteEmail } from './pages/Invite'
 
 const AuthStack = createStackNavigator(
   {
     Login,
     Register,
     Welcome,
-    ReadQRCode
+    ReadQRCode,
+    Invite: CheckInviteEmail
   },
   {
     headerMode: 'none',

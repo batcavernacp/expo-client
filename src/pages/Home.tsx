@@ -9,7 +9,7 @@ import { MyDevices } from '~/components/myDevices/my-devices-component'
 import { useStore } from '~/reducer'
 
 export function Home ({ navigation }: PageProps) {
-  const { switchRelay, state, error } = useAutomationAction()
+  const { switchRelay, error } = useAutomationAction()
   const { myDevices } = useStore()
   MyDevices()
   function navigate (route) {
@@ -26,9 +26,10 @@ export function Home ({ navigation }: PageProps) {
 
   function renderDevice ({ item }) {
     if (!item.id) return <></>
+
     return (
       <>
-        {/* <View style={[styles.led, state.turned === 'ON' && styles.active]} /> */}
+        <View style={[styles.led, item.status && styles.active]} />
         <Buttonperson
           onPressOut={switchOff(item.id)}
           onPressIn={switchOn(item.id)}

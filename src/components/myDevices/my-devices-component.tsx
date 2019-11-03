@@ -13,6 +13,7 @@ const QUERY_MY_DEVICES = graphql`
           id
           email
         }
+        pendingInvites
       }
       guest {
         id

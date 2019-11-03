@@ -4,12 +4,35 @@ import { useAuthAction } from '../actions/useAuthAction'
 import { SafeAreaView, FlatList } from 'react-navigation'
 import { Buttonperson } from '~/components/Button'
 import { colors } from '~/style/cores'
-import { MyDevices } from '~/components/myDevices/my-devices-component'
 import { useStore } from '~/reducer'
+import { Formik } from 'formik'
 
 export function Settings () {
   const { logout } = useAuthAction()
   const { myDevices } = useStore()
+
+  function renderDevice ({ item }) {
+    return (
+      <>
+        <Text>{item.name}</Text>
+        <Text>Convidados</Text>
+        <FlatList
+          data={item.users}
+          renderItem={renderUser}
+          keyExtractor={item => item.id} />
+        <Text>Convites pendentes</Text>
+        {renderPending(item.pendingInvites)}
+      </>
+    )
+  }
+
+  function renderUser ({ item }) {
+    return <Text>{item.email}</Text>
+  }
+
+  function renderPending (pending) {
+    return pending.map((item) => <Text key={item}>{item}</Text>)
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -23,22 +46,6 @@ export function Settings () {
       <View style={{ flex: 1 }}/>
     </SafeAreaView>
   )
-}
-
-function renderDevice ({ item }) {
-  return (
-    <>
-      <Text>{item.name}</Text>
-      <FlatList
-        data={item.users}
-        renderItem={renderUser}
-        keyExtractor={item => item.id} />
-    </>
-  )
-}
-
-function renderUser ({ item }) {
-  return <Text>{item.email}</Text>
 }
 
 export function navigationOptionsSettings ({ navigation }) {

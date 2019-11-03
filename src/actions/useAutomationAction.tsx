@@ -2,6 +2,7 @@ import { graphql } from 'react-relay'
 import { useMutation } from 'relay-hooks'
 import { useSubscription } from '~/useSubscription'
 import { useState } from 'react'
+import { useDispatch } from '~/reducer'
 
 const MUTATION_SWITCH = graphql`
   mutation useAutomationActionSwitchMutation($input: SwitchInput!) {
@@ -13,7 +14,9 @@ const SUBSCRIPTION_SWITCHED = graphql`
   subscription useAutomationActionSwitchedSubscription {
     switched {
       turned
-      relay
+      device {
+        id
+      }
     }
   }
 `
@@ -22,12 +25,13 @@ export function useAutomationAction () {
   const [mutateSwitch] = useMutation(MUTATION_SWITCH)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [state, setState] = useState({ turned: 'OFF', relay: 1 })
+  const { myDevicesDispatch } = useDispatch()
 
   useSubscription(SUBSCRIPTION_SWITCHED, {
     onNext: ({ switched }) => {
-      console.log({ switched })
-      setState(switched)
+      if (!switched.device) return
+      // TODO: improve device response time
+      myDevicesDispatch.switched(switched.device.id, switched.turned === 'ON')
     }
   })
 
@@ -35,7 +39,7 @@ export function useAutomationAction () {
     try {
       setLoading(true)
       setError('')
-      // setState({ turned: action, relay })
+      // myDevicesDispatch.switched(device, action === 'ON')
       await mutateSwitch({
         variables: {
           input: {
@@ -47,7 +51,7 @@ export function useAutomationAction () {
       setLoading(false)
     } catch (err) {
       console.log(err)
-      // setState({ turned: action === 'ON' ? 'OFF' : 'ON', relay })
+      // myDevicesDispatch.switched(device, action !== 'ON')
       setError(err[0] ? err[0].message : err.message)
     }
   }
@@ -57,8 +61,6 @@ export function useAutomationAction () {
 
     loading,
 
-    error,
-
-    state
+    error
   }
 }

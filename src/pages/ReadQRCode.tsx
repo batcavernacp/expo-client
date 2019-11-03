@@ -47,6 +47,7 @@ export function ReadQRCode ({ navigation }: PageProps) {
       <View style={styles.qrcodescanner}>
         <Qrcode/>
       </View>
+      <Buttonperson onPress={navigate('Invite')} styleButton={styles.botao}> Possuo um convite </Buttonperson>
       <View style={{ flex: 1 }}/>
     </SafeAreaView>
   )

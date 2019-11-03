@@ -1,13 +1,7 @@
+/* eslint-disable no-case-declarations */
 export const initialState: DeviceStore = {
-  owned: [{
-    id: null,
-    name: null,
-    users: [{ email: null, id: null }]
-  }],
-  guest: [{
-    id: null,
-    name: null
-  }],
+  owned: null,
+  guest: null,
   loading: false,
   error: null
 }
@@ -16,6 +10,7 @@ const types = {
   SET_MY_DEVICES: 'SET_MY_DEVICES',
   LOADING_MY_DEVICES: 'LOADING_DEVICES',
   ERROR_MY_DEVICES: 'ERROR_MY_DEVICES',
+  SWITCHED: 'SWITCHED',
   LOGOUT: 'LOGOUT'
 }
 
@@ -41,6 +36,16 @@ export function myDevicesReducer (state: DeviceStore, action) {
         error: action.payload
       }
 
+    case types.SWITCHED:
+      return {
+        ...state,
+        guest: state.guest.map(device =>
+          device.id === action.payload.id
+            ? { ...device, status: action.payload.status }
+            : device
+        )
+      }
+
     case types.LOGOUT:
       return initialState
 
@@ -56,15 +61,17 @@ export interface DeviceStore {
   error: string;
 }
 
-export interface DeviceOwned {
+export interface DeviceOwned extends DeviceGuest {
   id: string;
   name: string;
   users: [User];
+  pendingInvites: [string];
 }
 
 export interface DeviceGuest {
   id: string;
   name: string;
+  status: boolean;
 }
 
 export interface User {
@@ -86,6 +93,16 @@ export function useMyDevicesDispatch (dispatch) {
     dispatch({ type: types.LOADING_MY_DEVICES })
   }
 
+  function switched (id: string, status: boolean) {
+    dispatch({
+      type: types.SWITCHED,
+      payload: {
+        id,
+        status
+      }
+    })
+  }
+
   function setError (payload: string) {
     dispatch({ type: types.ERROR_MY_DEVICES, payload })
   }
@@ -98,6 +115,7 @@ export function useMyDevicesDispatch (dispatch) {
     setMyDevices,
     loadingDevices,
     setError,
-    logout
+    logout,
+    switched
   }
 }

@@ -13,44 +13,24 @@ import { Buttonperson } from '~/components/Button'
 
 interface RegisterForm {
   email: string;
-  password: string;
-  confirmPassword: string;
+}
+
+const initialValues: RegisterForm = {
+  email: ''
 }
 
 const validation = object().shape({
   email: string()
     .email('Email inválido')
-    .required('Email inválido'),
-
-  password: string()
-    .min(6, 'Senha deve conter no minimo 6 caracteres')
-    .required('Senha deve conter no minimo 6 caracteres'),
-
-  confirmPassword: string()
-    .required('senhas não conferem')
-    .test('compare', 'senhas não conferem',
-      function (confirmPassword) {
-        return confirmPassword === this.parent.password
-      })
+    .required('Email inválido')
 })
 
-export function Register ({ navigation }: PageProps) {
+export function CheckInviteEmail ({ navigation }: PageProps) {
   useBackButton(() => navigation.goBack(null))
-  const token = navigation.getParam('codigo')
-  const email = navigation.getParam('email')
 
-  const { registerWithDevice, loading, error, registerWithInvite } = useAuthAction()
+  const { checkEmail, loading, error } = useAuthAction()
 
-  const [passwordRef, setPasswordFocus] = useFocus<TextInput>()
-  const [password2Ref, setPassword2Focus] = useFocus<TextInput>()
-
-  const initialValues: RegisterForm = {
-    confirmPassword: '',
-    email: email || '',
-    password: ''
-  }
-
-  function RegisterForm (props: FormikProps<RegisterForm>) {
+  function CheckEmailForm (props: FormikProps<RegisterForm>) {
     const handleSubmit = ev => props.handleSubmit(ev)
 
     if (loading) return <SafeAreaView style={styles.loading}><ActivityIndicator size="large" color={colors.fl} /></SafeAreaView>
@@ -63,36 +43,16 @@ export function Register ({ navigation }: PageProps) {
           <Text style={{ color: colors.claro }}>{error}</Text>
           <TextInputFormik
             autoFocus={false}
+            autoCapitalize="none"
             textContentType="emailAddress"
             placeholder="email"
             name="email"
-            onSubmitEditing={setPasswordFocus}
-            blurOnSubmit={false}
-            returnKeyType="next"
-            editable={!email}
-          />
-
-          <TextInputFormik
-            inputRef={passwordRef}
-            textContentType="password"
-            secureTextEntry={true}
-            placeholder="password"
-            name="password"
-            onSubmitEditing={setPassword2Focus}
-            blurOnSubmit={false}
-            returnKeyType="next"
-          />
-          <TextInputFormik
-            inputRef={password2Ref}
-            textContentType="password"
-            secureTextEntry={true}
-            placeholder="confirm password"
-            name="confirmPassword"
             onSubmitEditing={handleSubmit}
             returnKeyType="done"
             blurOnSubmit={props.isValid}
           />
-          <Buttonperson onPress={handleSubmit} styleButton={styles.botao}>Cadastrar</Buttonperson>
+
+          <Buttonperson onPress={handleSubmit} styleButton={styles.botao}>Checar email</Buttonperson>
 
           <View style={{ flex: 1 }} />
         </SafeAreaView>
@@ -100,10 +60,10 @@ export function Register ({ navigation }: PageProps) {
     )
   }
 
-  function submit (values: RegisterForm, props: FormikHelpers<RegisterForm>) {
-    return token
-      ? registerWithDevice(values.email, values.password, token)
-      : registerWithInvite(values.email, values.password)
+  async function submit (values: RegisterForm, props: FormikHelpers<RegisterForm>) {
+    if (await checkEmail(values.email)) {
+      navigation.navigate('Register', { email: values.email })
+    }
   }
 
   return (
@@ -112,7 +72,7 @@ export function Register ({ navigation }: PageProps) {
         initialValues={initialValues}
         validationSchema={validation}
         onSubmit={submit}
-        render={RegisterForm}
+        render={CheckEmailForm}
       />
     </KeyboardAvoidingView>
   )

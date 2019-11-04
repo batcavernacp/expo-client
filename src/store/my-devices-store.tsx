@@ -11,10 +11,12 @@ const types = {
   LOADING_MY_DEVICES: 'LOADING_DEVICES',
   ERROR_MY_DEVICES: 'ERROR_MY_DEVICES',
   SWITCHED: 'SWITCHED',
+  SEND_INVITE: 'SEND_INVITE',
+  CANCEL_INVITE: 'CANCEL_INVITE',
   LOGOUT: 'LOGOUT'
 }
 
-export function myDevicesReducer (state: DeviceStore, action) {
+export function myDevicesReducer (state = initialState, action) {
   switch (action.type) {
     case types.SET_MY_DEVICES:
       return {
@@ -43,6 +45,31 @@ export function myDevicesReducer (state: DeviceStore, action) {
           device.id === action.payload.id
             ? { ...device, status: action.payload.status }
             : device
+        ),
+        owned: state.owned.map(device =>
+          device.id === action.payload.id
+            ? { ...device, status: action.payload.status }
+            : device
+        )
+      }
+
+    case types.SEND_INVITE:
+      return {
+        ...state,
+        owned: state.owned.map(device =>
+          device.id === action.payload.id
+            ? { ...device, pendingInvites: [...device.pendingInvites, action.payload.email] }
+            : device
+        )
+      }
+
+    case types.CANCEL_INVITE:
+      return {
+        ...state,
+        owned: state.owned.map(device =>
+          device.id === action.payload.id
+            ? { ...device, pendingInvites: device.pendingInvites.filter(invite => invite !== action.payload.email) }
+            : device
         )
       }
 
@@ -50,7 +77,7 @@ export function myDevicesReducer (state: DeviceStore, action) {
       return initialState
 
     default:
-      return initialState
+      return state
   }
 }
 
@@ -107,6 +134,26 @@ export function useMyDevicesDispatch (dispatch) {
     dispatch({ type: types.ERROR_MY_DEVICES, payload })
   }
 
+  function sendInvite (id, email) {
+    dispatch({
+      type: types.SEND_INVITE,
+      payload: {
+        id,
+        email
+      }
+    })
+  }
+
+  function cancelInvite (id, email) {
+    dispatch({
+      type: types.CANCEL_INVITE,
+      payload: {
+        id,
+        email
+      }
+    })
+  }
+
   function logout () {
     dispatch({ type: types.LOGOUT })
   }
@@ -114,8 +161,10 @@ export function useMyDevicesDispatch (dispatch) {
   return {
     setMyDevices,
     loadingDevices,
+    cancelInvite,
     setError,
     logout,
-    switched
+    switched,
+    sendInvite
   }
 }

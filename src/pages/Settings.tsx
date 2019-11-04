@@ -6,39 +6,56 @@ import { Buttonperson } from '~/components/Button'
 import { colors } from '~/style/cores'
 import { useStore } from '~/reducer'
 import { Formik } from 'formik'
+import { PageProps } from './interface'
+import { useDeviceSettingsAction } from '~/actions/useDeviceSettingsAction'
 
-export function Settings () {
+export function Settings ({ navigation }: PageProps) {
   const { logout } = useAuthAction()
   const { myDevices } = useStore()
+  const { cancelInvite } = useDeviceSettingsAction()
+
+  function navigate (route, params) {
+    return () => navigation.navigate(route, params)
+  }
+
+  function cancel (id, email) {
+    return () => cancelInvite(id, email)
+  }
 
   function renderDevice ({ item }) {
     return (
       <>
-        <Text>{item.name}</Text>
-        <Text>Convidados</Text>
+        <TextPadrao>{item.name}</TextPadrao>
+        <TextPadrao>Convidados</TextPadrao>
         <FlatList
           data={item.users}
           renderItem={renderUser}
           keyExtractor={item => item.id} />
-        <Text>Convites pendentes</Text>
-        {renderPending(item.pendingInvites)}
+        <TextPadrao>Convites pendentes</TextPadrao>
+        {renderPending(item.pendingInvites, item.id)}
+        <Buttonperson onPress={navigate('SendInvite', { device: item })} styleButton={styles.botao}> Convidar usuário </Buttonperson>
       </>
     )
   }
 
   function renderUser ({ item }) {
-    return <Text>{item.email}</Text>
+    return <TextPadrao>{item.email}</TextPadrao>
   }
 
-  function renderPending (pending) {
-    return pending.map((item) => <Text key={item}>{item}</Text>)
+  function renderPending (pending, device) {
+    return pending.map((item) => (
+      <View key={item}>
+        <TextPadrao >{item}</TextPadrao>
+        <Buttonperson onPress={cancel(device, item)} styleButton={styles.botao}>Cancelar convite</Buttonperson>
+      </View>
+    ))
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}/>
       <Buttonperson onPress={logout} styleButton={styles.botao}> Sair </Buttonperson>
-      {myDevices.loading && <Text>loading</Text>}
+      {myDevices.loading && <TextPadrao>loading</TextPadrao>}
       <FlatList
         data={myDevices.owned}
         renderItem={renderDevice}
@@ -54,6 +71,10 @@ export function navigationOptionsSettings ({ navigation }) {
   }
 }
 
+function TextPadrao ({ children }) {
+  return <Text style={styles.textoPadrao}>{children}</Text>
+}
+
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
@@ -62,5 +83,8 @@ const styles = StyleSheet.create({
   },
   botao: {
     padding: 20
+  },
+  textoPadrao: {
+    color: colors.claro
   }
 })

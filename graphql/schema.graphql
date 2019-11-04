@@ -74,6 +74,7 @@ type Mutation {
     registerWithDevice(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
     checkQRCode(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
     sendInvite(input: SendInviteInput!): SendInvitePayload! @auth
+    cancelInvite(input: SendInviteInput!): ResponsePayload! @auth
     switch(input: SwitchInput!): Boolean @auth
 }
 type Subscription { 

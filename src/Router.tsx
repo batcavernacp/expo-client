@@ -8,8 +8,8 @@ import { Welcome } from './pages/Welcome'
 import { ReadQRCode } from './pages/ReadQRCode'
 import { Settings, navigationOptionsSettings } from './pages/Settings'
 import { colors } from './style/cores'
-import { createMaterialTopTabNavigator } from 'react-navigation-tabs'
-import { CheckInviteEmail } from './pages/Invite'
+import { createMaterialTopTabNavigator, MaterialTopTabBar } from 'react-navigation-tabs'
+import { CheckInviteEmail, navigationOptionsInvite } from './pages/Invite'
 
 const AuthStack = createStackNavigator(
   {
@@ -53,6 +53,10 @@ const SettingsStack = createStackNavigator(
     Settings: {
       navigationOptions: navigationOptionsSettings,
       screen: Settings
+    },
+    SendInvite: {
+      navigationOptions: navigationOptionsInvite,
+      screen: CheckInviteEmail
     }
   },
   {
@@ -91,7 +95,8 @@ const AppTabs = createMaterialTopTabNavigator({
     },
     inactiveTintColor: colors.escr,
     activeTintColor: colors.fl
-  }
+  },
+  tabBarComponent: MaterialTopTabBar
 })
 
 const AppNavigator = createSwitchNavigator(

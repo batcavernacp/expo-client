@@ -10,6 +10,7 @@ import { TextInputFormik } from '~/components/form/Input'
 import { useFocus } from '~/useFocus'
 import { colors } from '~/style/cores'
 import { Buttonperson } from '~/components/Button'
+import { useDeviceSettingsAction } from '~/actions/useDeviceSettingsAction'
 
 interface RegisterForm {
   email: string;
@@ -27,13 +28,15 @@ const validation = object().shape({
 
 export function CheckInviteEmail ({ navigation }: PageProps) {
   useBackButton(() => navigation.goBack(null))
+  const device = navigation.getParam('device', null)
 
   const { checkEmail, loading, error } = useAuthAction()
+  const { sendInvite } = useDeviceSettingsAction()
 
   function CheckEmailForm (props: FormikProps<RegisterForm>) {
     const handleSubmit = ev => props.handleSubmit(ev)
 
-    if (loading) return <SafeAreaView style={styles.loading}><ActivityIndicator size="large" color={colors.fl} /></SafeAreaView>
+    if (loading || props.isSubmitting) return <SafeAreaView style={styles.loading}><ActivityIndicator size="large" color={colors.fl} /></SafeAreaView>
 
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -52,7 +55,9 @@ export function CheckInviteEmail ({ navigation }: PageProps) {
             blurOnSubmit={props.isValid}
           />
 
-          <Buttonperson onPress={handleSubmit} styleButton={styles.botao}>Checar email</Buttonperson>
+          <Buttonperson onPress={handleSubmit} styleButton={styles.botao}>
+            {device ? 'Enviar convite' : 'Checar email'}
+          </Buttonperson>
 
           <View style={{ flex: 1 }} />
         </SafeAreaView>
@@ -61,8 +66,16 @@ export function CheckInviteEmail ({ navigation }: PageProps) {
   }
 
   async function submit (values: RegisterForm, props: FormikHelpers<RegisterForm>) {
-    if (await checkEmail(values.email)) {
+    if (device) {
+      if (await sendInvite(device.id, values.email)) {
+        navigation.navigate('Settings')
+      } else {
+        props.setSubmitting(false)
+      }
+    } else if (await checkEmail(values.email)) {
       navigation.navigate('Register', { email: values.email })
+    } else {
+      props.setSubmitting(false)
     }
   }
 
@@ -76,6 +89,17 @@ export function CheckInviteEmail ({ navigation }: PageProps) {
       />
     </KeyboardAvoidingView>
   )
+}
+
+export function navigationOptionsInvite ({ navigation }) {
+  const device = navigation.getParam('device', null)
+
+  return device ? {
+    headerTitle: `Convidar para ${device.name}`
+
+  } : {
+    header: null
+  }
 }
 
 const styles = StyleSheet.create({

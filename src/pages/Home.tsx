@@ -51,6 +51,10 @@ export function Home ({ navigation }: PageProps) {
         data={myDevices.guest}
         renderItem={renderDevice}
         keyExtractor={item => item.id} />
+      <FlatList
+        data={myDevices.owned}
+        renderItem={renderDevice}
+        keyExtractor={item => item.id} />
       <View style={{ flex: 1 }} />
     </SafeAreaView>
   )

@@ -13,6 +13,9 @@ const types = {
   SWITCHED: 'SWITCHED',
   SEND_INVITE: 'SEND_INVITE',
   CANCEL_INVITE: 'CANCEL_INVITE',
+  REMOVE_USER: 'REMOVE_USER',
+  ADD_USER: 'ADD_USER',
+  ADD_DEVICE: 'ADD_DEVICE',
   LOGOUT: 'LOGOUT'
 }
 
@@ -63,12 +66,38 @@ export function myDevicesReducer (state = initialState, action) {
         )
       }
 
+    case types.ADD_USER:
+      return {
+        ...state,
+        owned: state.owned.map(device =>
+          device.id === action.payload.id
+            ? { ...device, users: [...device.users, action.payload.user] }
+            : device
+        )
+      }
+
+    case types.ADD_DEVICE:
+      return {
+        ...state,
+        owned: [...state.owned, action.payload.device]
+      }
+
     case types.CANCEL_INVITE:
       return {
         ...state,
         owned: state.owned.map(device =>
           device.id === action.payload.id
             ? { ...device, pendingInvites: device.pendingInvites.filter(invite => invite !== action.payload.email) }
+            : device
+        )
+      }
+
+    case types.REMOVE_USER:
+      return {
+        ...state,
+        owned: state.owned.map(device =>
+          device.id === action.payload.id
+            ? { ...device, users: device.users.filter(user => user.id !== action.payload.user) }
             : device
         )
       }
@@ -144,6 +173,16 @@ export function useMyDevicesDispatch (dispatch) {
     })
   }
 
+  function removeUser (id, user) {
+    dispatch({
+      type: types.REMOVE_USER,
+      payload: {
+        id,
+        user
+      }
+    })
+  }
+
   function cancelInvite (id, email) {
     dispatch({
       type: types.CANCEL_INVITE,
@@ -151,6 +190,26 @@ export function useMyDevicesDispatch (dispatch) {
         id,
         email
       }
+    })
+  }
+
+  function addUser (id, user) {
+    dispatch({
+      type: types.ADD_USER,
+      payload: {
+        id,
+        user
+      }
+    })
+  }
+
+  function addDevice (device: DeviceOwned) {
+    dispatch({
+      type: types.ADD_DEVICE,
+      payload: {
+        device
+      }
+
     })
   }
 
@@ -165,6 +224,9 @@ export function useMyDevicesDispatch (dispatch) {
     setError,
     logout,
     switched,
-    sendInvite
+    sendInvite,
+    removeUser,
+    addUser,
+    addDevice
   }
 }

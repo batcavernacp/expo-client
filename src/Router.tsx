@@ -6,7 +6,7 @@ import { Register } from './pages/Register'
 import { SplashScreen } from './pages/SplashScreen'
 import { Welcome } from './pages/Welcome'
 import { ReadQRCode } from './pages/ReadQRCode'
-import { Settings, navigationOptionsSettings } from './pages/Settings'
+import { Settings } from './pages/Settings'
 import { colors } from './style/cores'
 import { createMaterialTopTabNavigator, MaterialTopTabBar } from 'react-navigation-tabs'
 import { CheckInviteEmail, navigationOptionsInvite } from './pages/Invite'
@@ -51,12 +51,20 @@ const HomeStack = createStackNavigator(
 const SettingsStack = createStackNavigator(
   {
     Settings: {
-      navigationOptions: navigationOptionsSettings,
-      screen: Settings
+      screen: Settings,
+      navigationOptions: {
+        headerTitle: 'Meus dispositivos'
+      }
     },
     SendInvite: {
       navigationOptions: navigationOptionsInvite,
       screen: CheckInviteEmail
+    },
+    AddNewDevice: {
+      screen: ReadQRCode,
+      navigationOptions: {
+        headerTitle: 'Adicionar novo dispositivo'
+      }
     }
   },
   {

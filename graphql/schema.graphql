@@ -37,26 +37,30 @@ type ResponsePayload {
     success: Boolean!
     error: String
 }
+type CreateDevicePayload { 
+    token: String!
+}
+type SendInvitePayload { 
+    user: User
+    success: Boolean!
+    error: String
+}
 type LoginPayload { 
     user: User!
+}
+type RegisterNewDevicePayload { 
+    device: Device
+    success: Boolean!
+    error: String
 }
 type MyDevicesPayload { 
     owned: [Device]
     guest: [Device]
 }
-type RegisterInvitePayload { 
+type RegisterUserPayload { 
     user: User
     success: Boolean!
     error: String
-}
-type CreateDevicePayload { 
-    token: String!
-}
-type RegisterWithDevicePayload { 
-    success: Boolean
-}
-type SendInvitePayload { 
-    success: Boolean
 }
 type SwitchedPayload { 
     turned: SWITCH
@@ -67,32 +71,42 @@ type Query {
     myDevices: MyDevicesPayload! @auth
 }
 type Mutation { 
-    login: LoginPayload! @auth
-    checkEmail(input: CheckEmailInput!): ResponsePayload!
-    registerWithInvite: RegisterInvitePayload!
-    createDevice(device: CreateDeviceInput!): CreateDevicePayload!
-    registerWithDevice(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
-    checkQRCode(input: RegisterWithDeviceInput!): RegisterWithDevicePayload!
+    createDevice(input: CreateDeviceInput!): CreateDevicePayload!
     sendInvite(input: SendInviteInput!): SendInvitePayload! @auth
     cancelInvite(input: SendInviteInput!): ResponsePayload! @auth
+    login: LoginPayload! @auth
+    removeUser(input: RemoveUserInput!): ResponsePayload! @auth
+    registerNewDevice(input: RegisterNewDeviceInput!): RegisterNewDevicePayload! @auth
+    checkEmail(input: CheckEmailInput!): ResponsePayload!
+    registerWithInvite: RegisterUserPayload!
+    registerWithDevice(input: RegisterWithDeviceInput!): RegisterUserPayload!
+    checkQRCode(input: RegisterWithDeviceInput!): ResponsePayload!
     switch(input: SwitchInput!): Boolean @auth
 }
 type Subscription { 
     switched: SwitchedPayload
 }
-input CheckEmailInput { 
-    email: String!
-}
 input CreateDeviceInput { 
-    id: String
-}
-input RegisterWithDeviceInput { 
-    qrcode: String!
-    name: String
+    device: ID!
 }
 input SendInviteInput { 
     device: ID!
     email: String!
+}
+input RegisterNewDeviceInput { 
+    qrcode: String!
+    name: String!
+}
+input RemoveUserInput { 
+    device: ID!
+    user: ID!
+}
+input CheckEmailInput { 
+    email: String!
+}
+input RegisterWithDeviceInput { 
+    qrcode: String!
+    name: String
 }
 input SwitchInput { 
     turn: SWITCH!

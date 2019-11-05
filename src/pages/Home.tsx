@@ -48,10 +48,12 @@ export function Home ({ navigation }: PageProps) {
       <View style={{ flex: 1 }} />
       <Text style={styles.error}>{error}</Text>
       <FlatList
+        listKey='guestDevices'
         data={myDevices.guest}
         renderItem={renderDevice}
         keyExtractor={item => item.id} />
       <FlatList
+        listKey='ownedDevices'
         data={myDevices.owned}
         renderItem={renderDevice}
         keyExtractor={item => item.id} />

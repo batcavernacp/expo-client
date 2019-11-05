@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import { Button, StyleSheet, StatusBar, Switch, Text, View, Dimensions } from 'react-native'
-import { Me } from '../components/me'
+import { StyleSheet, Text, View, Dimensions } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { PageProps } from './interface'
-import { useAutomationAction } from '~/actions/useAutomationAction'
 import { colors } from '~/style/cores'
 import { Buttonperson } from '~/components/Button'
 import { useAuthAction } from '~/actions/useAuthAction'
 import { useQrcodeScanner } from '~/device/useQrcodeScanner'
+import { useDeviceSettingsAction } from '~/actions/useDeviceSettingsAction'
 
 const screenWidth = Dimensions.get('window').width
 
 export function ReadQRCode ({ navigation }: PageProps) {
+  const isNewDevice = navigation.getParam('newDevice', false)
+
   const [Qrcode, codigo] = useQrcodeScanner()
   const { checkQRCode } = useAuthAction()
+  const { registerNewDevice } = useDeviceSettingsAction()
   const [message, setMessage] = useState('Leia o QR Code')
 
   function navigate (route) {
@@ -23,21 +25,35 @@ export function ReadQRCode ({ navigation }: PageProps) {
   useEffect(() => {
     if (!codigo) return
     setMessage('Checando codigo')
-    checkQRCode(codigo).then(success => {
-      if (!success) {
+    if (isNewDevice) {
+      registerNewDevice(codigo).then(success => {
+        if (!success) {
+          setMessage('Codigo inválido')
+          return
+        }
+
+        navigation.navigate('Settings')
+        return true
+      }).catch(err => {
+        console.log(err)
         setMessage('Codigo inválido, leia outro codigo')
-        return
-      }
+        return false
+      })
+    } else {
+      checkQRCode(codigo).then(success => {
+        if (!success) {
+          setMessage('Codigo inválido, leia outro codigo')
+          return
+        }
 
-      navigation.navigate('Register', { codigo })
-      return true
-    }).catch(err => {
-      console.log(err)
-      setMessage('Codigo inválido, leia outro codigo')
-      return false
-    })
-
-    // checar codigo no backend
+        navigation.navigate('Register', { codigo })
+        return true
+      }).catch(err => {
+        console.log(err)
+        setMessage('Codigo inválido, leia outro codigo')
+        return false
+      })
+    }
   }, [codigo])
 
   return (
@@ -47,7 +63,7 @@ export function ReadQRCode ({ navigation }: PageProps) {
       <View style={styles.qrcodescanner}>
         <Qrcode/>
       </View>
-      <Buttonperson onPress={navigate('Invite')} styleButton={styles.botao}> Possuo um convite </Buttonperson>
+      {!isNewDevice && <Buttonperson onPress={navigate('Invite')} styleButton={styles.botao}> Possuo um convite </Buttonperson>}
       <View style={{ flex: 1 }}/>
     </SafeAreaView>
   )

@@ -9,9 +9,16 @@ type Device implements Node {
     name: String
     usersInvited: [User]
     pendingInvites: [String]
+    logs(after: String, before: String, first: Int, last: Int): LogConnection
     id: ID!
     createdAt: String
     updatedAt: String
+}
+type Log implements Node { 
+    id: ID!
+    user: User
+    action: LogAction
+    createdAt: Datetime
 }
 type User implements Node { 
     email: String
@@ -112,7 +119,22 @@ input SwitchInput {
     turn: SWITCH!
     device: ID!
 }
+enum LogAction { 
+    ON
+    OFF
+    REMOVE_USER
+    INVITE_USER
+}
 enum SWITCH { 
     ON
     OFF
+}
+scalar Datetime  
+type LogEdge { 
+    cursor: String
+    node: Log
+}
+type LogConnection { 
+    edges: [LogEdge]!
+    pageInfo: PageInfo!
 }

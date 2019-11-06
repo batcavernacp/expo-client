@@ -1,44 +1,42 @@
 /* eslint-disable no-case-declarations */
 export const initialState: DeviceStore = {
   owned: null,
-  guest: null,
-  loading: false,
-  error: null
+  guest: null
 }
 
 const types = {
-  SET_MY_DEVICES: 'SET_MY_DEVICES',
-  LOADING_MY_DEVICES: 'LOADING_DEVICES',
-  ERROR_MY_DEVICES: 'ERROR_MY_DEVICES',
-  SWITCHED: 'SWITCHED',
-  SEND_INVITE: 'SEND_INVITE',
-  CANCEL_INVITE: 'CANCEL_INVITE',
-  REMOVE_USER: 'REMOVE_USER',
+  FETCH_MY_DEVICES_REQUEST: 'FETCH_MY_DEVICES_REQUEST',
+  FETCH_MY_DEVICES_SUCCESS: 'FETCH_MY_DEVICES_SUCCESS',
+  FETCH_MY_DEVICES_FAILURE: 'FETCH_MY_DEVICES_FAILURE',
+
+  SEND_INVITE_REQUEST: 'SEND_INVITE_REQUEST',
+  SEND_INVITE_SUCCESS: 'SEND_INVITE_SUCCESS',
+  SEND_INVITE_FAILURE: 'SEND_INVITE_FAILURE',
+
+  REMOVE_USER_REQUEST: 'REMOVE_USER_REQUEST',
+  REMOVE_USER_SUCCESS: 'REMOVE_USER_SUCCESS',
+  REMOVE_USER_FAILURE: 'REMOVE_USER_FAILURE',
+
+  CANCEL_INVITE_REQUEST: 'CANCEL_INVITE_REQUEST',
+  CANCEL_INVITE_SUCCESS: 'CANCEL_INVITE_SUCCESS',
+  CANCEL_INVITE_FAILURE: 'CANCEL_INVITE_FAILURE',
+
+  ADD_DEVICE_REQUEST: 'ADD_DEVICE_REQUEST',
+  ADD_DEVICE_SUCCESS: 'ADD_DEVICE_SUCCESS',
+  ADD_DEVICE_FAILURE: 'ADD_DEVICE_FAILURE',
+
+  // TODO: REQUEST, SUCCESS, FAILURE
   ADD_USER: 'ADD_USER',
-  ADD_DEVICE: 'ADD_DEVICE',
+
+  SWITCHED: 'SWITCHED',
   LOGOUT: 'LOGOUT'
 }
 
 export function myDevicesReducer (state = initialState, action) {
   switch (action.type) {
-    case types.SET_MY_DEVICES:
+    case types.FETCH_MY_DEVICES_SUCCESS:
       return {
-        loading: false,
-        error: null,
         ...action.payload
-      }
-
-    case types.LOADING_MY_DEVICES:
-      return {
-        ...state,
-        loading: true
-      }
-
-    case types.ERROR_MY_DEVICES:
-      return {
-        ...state,
-        loading: false,
-        error: action.payload
       }
 
     case types.SWITCHED:
@@ -56,7 +54,7 @@ export function myDevicesReducer (state = initialState, action) {
         )
       }
 
-    case types.SEND_INVITE:
+    case types.SEND_INVITE_SUCCESS:
       return {
         ...state,
         owned: state.owned.map(device =>
@@ -76,13 +74,13 @@ export function myDevicesReducer (state = initialState, action) {
         )
       }
 
-    case types.ADD_DEVICE:
+    case types.ADD_DEVICE_SUCCESS:
       return {
         ...state,
         owned: [...state.owned, action.payload.device]
       }
 
-    case types.CANCEL_INVITE:
+    case types.CANCEL_INVITE_SUCCESS:
       return {
         ...state,
         owned: state.owned.map(device =>
@@ -92,7 +90,7 @@ export function myDevicesReducer (state = initialState, action) {
         )
       }
 
-    case types.REMOVE_USER:
+    case types.REMOVE_USER_SUCCESS:
       return {
         ...state,
         owned: state.owned.map(device =>
@@ -113,8 +111,6 @@ export function myDevicesReducer (state = initialState, action) {
 export interface DeviceStore {
   owned: [DeviceOwned];
   guest: [DeviceGuest];
-  loading: boolean;
-  error: string;
 }
 
 export interface DeviceOwned extends DeviceGuest {
@@ -141,12 +137,16 @@ interface SetDevicePayload {
 }
 
 export function useMyDevicesDispatch (dispatch) {
-  function setMyDevices (payload: SetDevicePayload) {
-    dispatch({ type: types.SET_MY_DEVICES, payload })
+  function fetchDevicesSuccess (payload: SetDevicePayload) {
+    dispatch({ type: types.FETCH_MY_DEVICES_SUCCESS, payload })
   }
 
-  function loadingDevices () {
-    dispatch({ type: types.LOADING_MY_DEVICES })
+  function fetchDevicesRequest () {
+    dispatch({ type: types.FETCH_MY_DEVICES_REQUEST })
+  }
+
+  function sendInviteRequest () {
+    dispatch({ type: types.SEND_INVITE_REQUEST })
   }
 
   function switched (id: string, status: boolean) {
@@ -159,13 +159,42 @@ export function useMyDevicesDispatch (dispatch) {
     })
   }
 
-  function setError (payload: string) {
-    dispatch({ type: types.ERROR_MY_DEVICES, payload })
+  function fetchDevicesFailure (error: string) {
+    dispatch({
+      type: types.FETCH_MY_DEVICES_FAILURE,
+      payload: {
+        error
+      }
+    })
   }
 
-  function sendInvite (id, email) {
+  function sendInviteFailure (error: string) {
     dispatch({
-      type: types.SEND_INVITE,
+      type: types.SEND_INVITE_FAILURE,
+      payload: {
+        error
+      }
+    })
+  }
+
+  function removeUserRequest () {
+    dispatch({
+      type: types.REMOVE_USER_REQUEST
+    })
+  }
+
+  function removeUserFailure (error: string) {
+    dispatch({
+      type: types.REMOVE_USER_FAILURE,
+      payload: {
+        error
+      }
+    })
+  }
+
+  function sendInviteSuccess (id, email) {
+    dispatch({
+      type: types.SEND_INVITE_SUCCESS,
       payload: {
         id,
         email
@@ -173,9 +202,39 @@ export function useMyDevicesDispatch (dispatch) {
     })
   }
 
-  function removeUser (id, user) {
+  function cancelInviteFailure (error: string) {
     dispatch({
-      type: types.REMOVE_USER,
+      type: types.CANCEL_INVITE_FAILURE,
+      payload: {
+        error
+      }
+    })
+  }
+
+  function cancelInviteRequest () {
+    dispatch({
+      type: types.CANCEL_INVITE_REQUEST
+    })
+  }
+
+  function addDeviceFailure (error: string) {
+    dispatch({
+      type: types.ADD_DEVICE_FAILURE,
+      payload: {
+        error
+      }
+    })
+  }
+
+  function addDeviceRequest () {
+    dispatch({
+      type: types.ADD_DEVICE_REQUEST
+    })
+  }
+
+  function removeUserSuccess (id, user) {
+    dispatch({
+      type: types.REMOVE_USER_SUCCESS,
       payload: {
         id,
         user
@@ -183,9 +242,9 @@ export function useMyDevicesDispatch (dispatch) {
     })
   }
 
-  function cancelInvite (id, email) {
+  function cancelInviteSuccess (id, email) {
     dispatch({
-      type: types.CANCEL_INVITE,
+      type: types.CANCEL_INVITE_SUCCESS,
       payload: {
         id,
         email
@@ -203,9 +262,9 @@ export function useMyDevicesDispatch (dispatch) {
     })
   }
 
-  function addDevice (device: DeviceOwned) {
+  function addDeviceSuccess (device: DeviceOwned) {
     dispatch({
-      type: types.ADD_DEVICE,
+      type: types.ADD_DEVICE_SUCCESS,
       payload: {
         device
       }
@@ -218,15 +277,23 @@ export function useMyDevicesDispatch (dispatch) {
   }
 
   return {
-    setMyDevices,
-    loadingDevices,
-    cancelInvite,
-    setError,
+    fetchDevicesSuccess,
+    fetchDevicesRequest,
+    fetchDevicesFailure,
+    cancelInviteSuccess,
+    cancelInviteFailure,
+    cancelInviteRequest,
     logout,
     switched,
-    sendInvite,
-    removeUser,
+    sendInviteRequest,
+    sendInviteSuccess,
+    sendInviteFailure,
+    removeUserSuccess,
+    removeUserRequest,
+    removeUserFailure,
     addUser,
-    addDevice
+    addDeviceSuccess,
+    addDeviceFailure,
+    addDeviceRequest
   }
 }

@@ -1,11 +1,12 @@
 import { graphql } from 'react-relay'
 import { useMutation } from 'relay-hooks'
-import { useState } from 'react'
 import { useDispatch } from '~/reducer'
+import { SendInviteInput, RemoveUserInput, RegisterNewDeviceInput, SendInvitePayload } from '~/generated/graphql'
+import { Payload } from '~/pages/interface'
 
 const MUTATION_SEND_INVITE = graphql`
   mutation useDeviceSettingsActionSendInviteMutation($input:  SendInviteInput!) {
-  sendInvite(input: $input) {
+  payload: sendInvite(input: $input) {
     success
     user {
       id
@@ -27,6 +28,7 @@ const MUTATION_REMOVE_USER = graphql`
   mutation useDeviceSettingsActionRemoveUserMutation($input:  RemoveUserInput!) {
   removeUser(input: $input) {
     success
+    error
   }
 }
 `
@@ -54,104 +56,76 @@ export function useDeviceSettingsAction () {
   const [mutateCancelInvite] = useMutation(MUTATION_CANCEL_INVITE)
   const [mutateRemoveUser] = useMutation(MUTATION_REMOVE_USER)
   const [mutateRegisterNewDevice] = useMutation(MUTATION_REGISTER_NEW_DEVICE)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const { myDevicesDispatch } = useDispatch()
 
-  async function sendInvite (device, email) {
+  async function sendInvite (input: SendInviteInput) {
     try {
-      setLoading(true)
-      setError('')
-      const { sendInvite } = await mutateSendInvite({
+      myDevicesDispatch.sendInviteRequest()
+      const { payload }: Payload<SendInvitePayload> = await mutateSendInvite({
         variables: {
-          input: {
-            device,
-            email
-          }
+          input
         }
       })
-      if (!sendInvite.user) {
-        myDevicesDispatch.sendInvite(device, email)
+      if (!payload.user) {
+        myDevicesDispatch.sendInviteSuccess(input.device, input.email)
       } else {
-        myDevicesDispatch.addUser(device, sendInvite.user)
+        myDevicesDispatch.addUser(input.device, payload.user)
       }
-      setLoading(false)
       return true
     } catch (err) {
-      console.log(err)
-      setError(err[0] ? err[0].message : err.message)
+      myDevicesDispatch.sendInviteFailure(err[0] ? err[0].message : err.message)
       return false
     }
   }
 
-  async function cancelInvite (device, email) {
+  async function cancelInvite (input: SendInviteInput) {
     try {
-      setLoading(true)
-      setError('')
+      myDevicesDispatch.cancelInviteRequest()
       await mutateCancelInvite({
         variables: {
-          input: {
-            device,
-            email
-          }
+          input
         }
       })
-      myDevicesDispatch.cancelInvite(device, email)
-      setLoading(false)
+      myDevicesDispatch.cancelInviteSuccess(input.device, input.email)
       return true
     } catch (err) {
-      console.log(err)
-      setError(err[0] ? err[0].message : err.message)
+      myDevicesDispatch.cancelInviteFailure(err[0] ? err[0].message : err.message)
       return false
     }
   }
 
-  async function removeUser (device, user) {
+  async function removeUser (input: RemoveUserInput) {
     try {
-      setLoading(true)
-      setError('')
+      myDevicesDispatch.removeUserRequest()
       await mutateRemoveUser({
         variables: {
-          input: {
-            device,
-            user
-          }
+          input
         }
       })
-      myDevicesDispatch.removeUser(device, user)
-      setLoading(false)
+      myDevicesDispatch.removeUserSuccess(input.device, input.user)
       return true
     } catch (err) {
-      console.log(err)
-      setError(err[0] ? err[0].message : err.message)
+      myDevicesDispatch.removeUserFailure(err[0] ? err[0].message : err.message)
       return false
     }
   }
 
-  async function registerNewDevice (qrcode, name = 'test') {
+  async function registerNewDevice (input: RegisterNewDeviceInput) {
     try {
-      setLoading(true)
-      setError('')
+      myDevicesDispatch.addDeviceRequest()
       const { registerNewDevice } = await mutateRegisterNewDevice({
         variables: {
-          input: {
-            qrcode,
-            name
-          }
+          input
         }
       })
-      const { success, error, device } = registerNewDevice
+      const { error, device } = registerNewDevice
 
       if (error) throw new Error(error)
 
-      if (!success) throw new Error('Unk')
-
-      myDevicesDispatch.addDevice(device)
-      setLoading(false)
+      myDevicesDispatch.addDeviceSuccess(device)
       return true
     } catch (err) {
-      console.log(err)
-      setError(err[0] ? err[0].message : err.message)
+      myDevicesDispatch.addDeviceFailure(err[0] ? err[0].message : err.message)
       return false
     }
   }
@@ -163,10 +137,6 @@ export function useDeviceSettingsAction () {
 
     removeUser,
 
-    registerNewDevice,
-
-    loading,
-
-    error
+    registerNewDevice
   }
 }

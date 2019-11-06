@@ -29,11 +29,11 @@ export function MyDevices () {
 
   useEffect(() => {
     if (error) {
-      myDevicesDispatch.setError(error[0] ? error[0].message : error.message)
+      myDevicesDispatch.fetchDevicesFailure(error[0] ? error[0].message : error.message)
     } else if (!props) {
-      myDevicesDispatch.loadingDevices()
+      myDevicesDispatch.fetchDevicesRequest()
     } else {
-      myDevicesDispatch.setMyDevices(props.myDevices)
+      myDevicesDispatch.fetchDevicesSuccess(props.myDevices)
     }
   }, [props, error])
 }

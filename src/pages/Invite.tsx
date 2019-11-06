@@ -67,7 +67,7 @@ export function CheckInviteEmail ({ navigation }: PageProps) {
 
   async function submit (values: RegisterForm, props: FormikHelpers<RegisterForm>) {
     if (device) {
-      if (await sendInvite(device.id, values.email)) {
+      if (await sendInvite({ device: device.id, email: values.email })) {
         navigation.navigate('Settings')
       } else {
         props.setSubmitting(false)

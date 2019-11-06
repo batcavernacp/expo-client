@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { StyleSheet, Text, View, Dimensions } from 'react-native'
 import { SafeAreaView } from 'react-navigation'
 import { PageProps } from './interface'
@@ -7,6 +7,7 @@ import { Buttonperson } from '~/components/Button'
 import { useAuthAction } from '~/actions/useAuthAction'
 import { useQrcodeScanner } from '~/device/useQrcodeScanner'
 import { useDeviceSettingsAction } from '~/actions/useDeviceSettingsAction'
+import { useStore } from '~/reducer'
 
 const screenWidth = Dimensions.get('window').width
 
@@ -16,7 +17,7 @@ export function ReadQRCode ({ navigation }: PageProps) {
   const [Qrcode, codigo] = useQrcodeScanner()
   const { checkQRCode } = useAuthAction()
   const { registerNewDevice } = useDeviceSettingsAction()
-  const [message, setMessage] = useState('Leia o QR Code')
+  const { loading, error } = useStore()
 
   function navigate (route) {
     return () => navigation.navigate(route)
@@ -24,11 +25,9 @@ export function ReadQRCode ({ navigation }: PageProps) {
 
   useEffect(() => {
     if (!codigo) return
-    setMessage('Checando codigo')
     if (isNewDevice) {
-      registerNewDevice(codigo).then(success => {
+      registerNewDevice({ qrcode: codigo, name: 'test' }).then(success => {
         if (!success) {
-          setMessage('Codigo inválido')
           return
         }
 
@@ -36,13 +35,11 @@ export function ReadQRCode ({ navigation }: PageProps) {
         return true
       }).catch(err => {
         console.log(err)
-        setMessage('Codigo inválido, leia outro codigo')
         return false
       })
     } else {
       checkQRCode(codigo).then(success => {
         if (!success) {
-          setMessage('Codigo inválido, leia outro codigo')
           return
         }
 
@@ -50,7 +47,6 @@ export function ReadQRCode ({ navigation }: PageProps) {
         return true
       }).catch(err => {
         console.log(err)
-        setMessage('Codigo inválido, leia outro codigo')
         return false
       })
     }
@@ -59,7 +55,7 @@ export function ReadQRCode ({ navigation }: PageProps) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}/>
-      <Text style={styles.text}>{message}</Text>
+      <Text style={styles.text}>{loading.ADD_DEVICE && 'Carregando'}{error.ADD_DEVICE}</Text>
       <View style={styles.qrcodescanner}>
         <Qrcode/>
       </View>

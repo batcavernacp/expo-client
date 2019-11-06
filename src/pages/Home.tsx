@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { StyleSheet, StatusBar, Text, View } from 'react-native'
 import { SafeAreaView, FlatList } from 'react-navigation'
 import { PageProps } from './interface'
@@ -7,32 +7,31 @@ import { colors } from '~/style/cores'
 import { Buttonperson } from '~/components/Button'
 import { MyDevices } from '~/components/myDevices/my-devices-component'
 import { useStore } from '~/reducer'
+import { Switch } from '~/generated/graphql'
 
 export function Home ({ navigation }: PageProps) {
-  const { switchRelay, error } = useAutomationAction()
+  const { switchRelay } = useAutomationAction()
   const { myDevices } = useStore()
+
   MyDevices()
+
   function navigate (route) {
     return () => navigation.navigate(route)
-  }
-
-  function switchOn (device) {
-    return () => switchRelay('ON', device)
-  }
-
-  function switchOff (device) {
-    return () => switchRelay('OFF', device)
   }
 
   function renderDevice ({ item }) {
     if (!item.id) return <></>
 
+    function switchDevice (action: Switch) {
+      return () => switchRelay({ device: item.id, turn: action })
+    }
+
     return (
       <>
         <View style={[styles.led, item.status && styles.active]} />
         <Buttonperson
-          onPressOut={switchOff(item.id)}
-          onPressIn={switchOn(item.id)}
+          onPressOut={switchDevice(Switch.Off)}
+          onPressIn={switchDevice(Switch.On)}
           styleButton={styles.botao}
         >
           {item.name}
@@ -46,7 +45,7 @@ export function Home ({ navigation }: PageProps) {
     <SafeAreaView style={styles.container}>
       <StatusBar translucent={true} backgroundColor="transparent"/>
       <View style={{ flex: 1 }} />
-      <Text style={styles.error}>{error}</Text>
+      {/* <Text style={styles.error}>{error}</Text> */}
       <FlatList
         listKey='guestDevices'
         data={myDevices.guest}

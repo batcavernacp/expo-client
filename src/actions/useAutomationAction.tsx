@@ -3,6 +3,7 @@ import { useMutation } from 'relay-hooks'
 import { useSubscription } from '~/useSubscription'
 import { useState } from 'react'
 import { useDispatch } from '~/reducer'
+import { SwitchInput } from '~/generated/graphql'
 
 const MUTATION_SWITCH = graphql`
   mutation useAutomationActionSwitchMutation($input: SwitchInput!) {
@@ -35,17 +36,14 @@ export function useAutomationAction () {
     }
   })
 
-  async function switchRelay (action, device) {
+  async function switchRelay (input: SwitchInput) {
     try {
       setLoading(true)
       setError('')
       // myDevicesDispatch.switched(device, action === 'ON')
       await mutateSwitch({
         variables: {
-          input: {
-            turn: action,
-            device
-          }
+          input
         }
       })
       setLoading(false)

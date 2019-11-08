@@ -40,7 +40,6 @@ export function useAutomationAction () {
     try {
       setLoading(true)
       setError('')
-      // myDevicesDispatch.switched(device, action === 'ON')
       await mutateSwitch({
         variables: {
           input
@@ -49,7 +48,6 @@ export function useAutomationAction () {
       setLoading(false)
     } catch (err) {
       console.log(err)
-      // myDevicesDispatch.switched(device, action !== 'ON')
       setError(err[0] ? err[0].message : err.message)
     }
   }

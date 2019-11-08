@@ -6,6 +6,7 @@ export type Scalars = {
   Boolean: boolean,
   Int: number,
   Float: number,
+  Datetime: any,
 };
 
 
@@ -30,16 +31,25 @@ export type CreateDevicePayload = {
   token: Scalars['String'],
 };
 
+
 export type Device = Node & {
    __typename?: 'Device',
   owner?: Maybe<User>,
   name?: Maybe<Scalars['String']>,
   usersInvited?: Maybe<Array<Maybe<User>>>,
   pendingInvites?: Maybe<Array<Maybe<Scalars['String']>>>,
-  log?: Maybe<LogConnection>,
+  logs?: Maybe<LogConnection>,
   id: Scalars['ID'],
   createdAt?: Maybe<Scalars['String']>,
   updatedAt?: Maybe<Scalars['String']>,
+};
+
+
+export type DeviceLogsArgs = {
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  last?: Maybe<Scalars['Int']>
 };
 
 export type Log = Node & {
@@ -47,13 +57,16 @@ export type Log = Node & {
   id: Scalars['ID'],
   user?: Maybe<User>,
   action?: Maybe<LogAction>,
+  payload?: Maybe<Scalars['String']>,
+  createdAt?: Maybe<Scalars['Datetime']>,
 };
 
 export enum LogAction {
   On = 'ON',
   Off = 'OFF',
   RemoveUser = 'REMOVE_USER',
-  InviteUser = 'INVITE_USER'
+  InviteUser = 'INVITE_USER',
+  CancelInvite = 'CANCEL_INVITE'
 }
 
 export type LogConnection = {

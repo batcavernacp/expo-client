@@ -1,13 +1,14 @@
 import { graphql } from 'react-relay'
 import { useMutation } from 'relay-hooks'
 import { useDispatch } from '~/reducer'
-import { SendInviteInput, RemoveUserInput, RegisterNewDeviceInput, SendInvitePayload } from '~/generated/graphql'
+import { SendInviteInput, RemoveUserInput, RegisterNewDeviceInput, SendInvitePayload, ResponsePayload } from '~/generated/graphql'
 import { Payload } from '~/pages/interface'
 
 const MUTATION_SEND_INVITE = graphql`
   mutation useDeviceSettingsActionSendInviteMutation($input:  SendInviteInput!) {
   payload: sendInvite(input: $input) {
     success
+    error
     user {
       id
       email
@@ -18,15 +19,16 @@ const MUTATION_SEND_INVITE = graphql`
 
 const MUTATION_CANCEL_INVITE = graphql`
   mutation useDeviceSettingsActionCancelInviteMutation($input:  SendInviteInput!) {
-  cancelInvite(input: $input) {
+  payload: cancelInvite(input: $input) {
     success
+    error
   }
 }
 `
 
 const MUTATION_REMOVE_USER = graphql`
   mutation useDeviceSettingsActionRemoveUserMutation($input:  RemoveUserInput!) {
-  removeUser(input: $input) {
+  payload: removeUser(input: $input) {
     success
     error
   }
@@ -66,6 +68,9 @@ export function useDeviceSettingsAction () {
           input
         }
       })
+
+      if (payload.error) throw new Error(payload.error)
+
       if (!payload.user) {
         myDevicesDispatch.sendInviteSuccess(input.device, input.email)
       } else {
@@ -81,11 +86,14 @@ export function useDeviceSettingsAction () {
   async function cancelInvite (input: SendInviteInput) {
     try {
       myDevicesDispatch.cancelInviteRequest()
-      await mutateCancelInvite({
+      const { payload }: Payload<ResponsePayload> = await mutateCancelInvite({
         variables: {
           input
         }
       })
+
+      if (payload.error) throw new Error(payload.error)
+
       myDevicesDispatch.cancelInviteSuccess(input.device, input.email)
       return true
     } catch (err) {
@@ -97,11 +105,14 @@ export function useDeviceSettingsAction () {
   async function removeUser (input: RemoveUserInput) {
     try {
       myDevicesDispatch.removeUserRequest()
-      await mutateRemoveUser({
+      const { payload }: Payload<ResponsePayload> = await mutateRemoveUser({
         variables: {
           input
         }
       })
+
+      if (payload.error) throw new Error(payload.error)
+
       myDevicesDispatch.removeUserSuccess(input.device, input.user)
       return true
     } catch (err) {

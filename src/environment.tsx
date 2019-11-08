@@ -6,19 +6,18 @@ import { parse } from 'graphql'
 import { Environment, Network, RecordSource, Store } from 'relay-runtime'
 import firebase from './services/firebase'
 
-let token: Promise<string>
+let userFire: firebase.User
 
-firebase.auth().onAuthStateChanged(async user => {
-  token = user ? user.getIdToken(true) : null
-  console.log(await token)
+firebase.auth().onAuthStateChanged(user => {
+  userFire = user
 })
 
 const authLink = setContext(async (_, { headers }) =>
-  token
+  userFire
     ? {
       headers: {
         ...headers,
-        token: await token
+        token: await userFire.getIdToken(true)
       }
     }
     : {
@@ -36,7 +35,7 @@ const httpLink = new HttpLink({
 
 const subscriptionLink = () => new WebSocketLink({
   options: {
-    connectionParams: async () => (token ? { token: await token } : {}),
+    connectionParams: async () => (userFire ? { token: await userFire.getIdToken(true) } : {}),
     reconnect: true
   },
   uri: __DEV__
